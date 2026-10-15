@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng Lý Thuyết Dây</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        topo: {
+                            bg: '#020617',
+                            card: '#090d16',
+                            cyan: '#06b6d4',
+                            teal: '#14b8a6',
+                            gold: '#f59e0b',
+                            magenta: '#ec4899',
+                            purple: '#a855f7'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 8s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-topo-bg text-slate-100 min-h-screen flex flex-col antialiased selection:bg-purple-500 selection:text-black">
+
+    <!-- Audio Player Fly Widget (Fixed Bottom-Right) -->
+    <div id="flyMusicPlayer" class="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-topo-card/90 border border-purple-500/30 backdrop-blur-xl px-4 py-3 rounded-2xl shadow-2xl shadow-purple-500/10 transition-all duration-300 hover:border-purple-500/60">
+        <!-- Vinyl / CD Icon Spin Effect -->
+        <div id="musicIconWrapper" class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 via-cyan-500 to-amber-400 p-0.5 flex items-center justify-center cursor-pointer shadow-md">
+            <div id="vinylCenter" class="w-full h-full bg-slate-950 rounded-full flex items-center justify-center">
+                <svg id="playPauseIcon" class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        </div>
+
+        <div class="flex flex-col">
+            <span class="text-xs font-semibold text-slate-200 flex items-center gap-1">
+                <span>Nhạc Nền Topo</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            </span>
+            <span id="musicStatusText" class="text-[10px] text-slate-400">Nhấn để phát nhạc</span>
+        </div>
+
+        <button id="btnToggleMusic" class="ml-2 px-2.5 py-1.5 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-medium transition-all">
+            Phát
+        </button>
+
+        <!-- THẺ AUDIO: Thay link mp3 của bạn vào thuộc tính src dưới đây -->
+        <audio id="bgAudio" loop preload="auto">
+            <source src="./mp3/universal-path.mp3" type="audio/mpeg">
+            Trình duyệt của bạn không hỗ trợ thẻ audio.
+        </audio>
+    </div>
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-topo-card/75 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-cyan-500 to-amber-400 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                    <svg class="w-6 h-6 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg bg-gradient-to-r from-purple-400 via-cyan-300 to-amber-300 bg-clip-text text-transparent">Quantum Topology & Noble Path</h1>
+                    <p class="text-xs text-slate-400">Mô phỏng Biến dạng Không-thời gian, Độ uốn cong Topo & Bát Chánh Đạo</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <button id="btnPerfect" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-purple-500/20 transition-all transform active:scale-95 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    Không Gian Topo Viên Mãn
+                </button>
+                <button id="btnReset" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-sm rounded-xl transition-all">
+                    Đặt lại
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left Column: Controls -->
+        <section class="lg:col-span-7 flex flex-col gap-4">
+            <div class="bg-topo-card/80 border border-slate-800/80 rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                    <h2 class="font-semibold text-base flex items-center gap-2 text-purple-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                        Bảng Điều Khiển Thông Số Topo Học
+                    </h2>
+                    <span id="topoStatus" class="text-xs px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-medium">Trạng thái: Lưới Đa Chiều Ổn Định</span>
+                </div>
+
+                <div class="space-y-4 max-h-[600px] overflow-y-auto pr-1">
+                    
+                    <!-- 1. Chánh Kiến -->
+                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-purple-500/40 transition-colors">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                                1. Chánh Kiến - Hệ số Genus (Right View)
+                            </span>
+                            <span id="val1" class="text-xs font-mono text-purple-400 bg-purple-950/50 px-2 py-0.5 rounded border border-purple-800/50">Genus 1 (Torus)</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-2">Định hình cấu trúc hình học nền tảng của không gian (Số lỗ xuyên qua mặt phẳng topo).</p>
+                        <input type="range" id="slider1" min="0" max="4" step="1" value="1" class="w-full accent-purple-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- 2. Chánh Tư Duy -->
+                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-cyan-500/40 transition-colors">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                                2. Chánh Tư Duy - Độ Uốn Gauss (Right Intention)
+                            </span>
+                            <span id="val2" class="text-xs font-mono text-cyan-400 bg-cyan-950/50 px-2 py-0.5 rounded border border-cyan-800/50">1.0 K</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-2">Độ cong không-thời gian hướng ý niệm nội tại (Dương: Hình cầu, Âm: Yên ngựa).</p>
+                        <input type="range" id="slider2" min="-2" max="2" step="0.2" value="1.0" class="w-full accent-cyan-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- 3. Chánh Ngữ -->
+                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-teal-500/40 transition-colors">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-teal-400"></span>
+                                3. Chánh Ngữ - Biên độ Sóng Lưới (Right Speech)
+                            </span>
+                            <span id="val3" class="text-xs font-mono text-teal-400 bg-teal-950/50 px-2 py-0.5 rounded border border-teal-800/50">20 px</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-2">Sự truyền tải năng lượng ngôn từ qua các chiều sóng không gian.</p>
+                        <input type="range" id="slider3" min="5" max="50" step="1" value="20" class="w-full accent-teal-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- 4. Chánh Nghiệp -->
+                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-blue-500/40 transition-colors">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                                4. Chánh Nghiệp - Mật độ Lưới (Right Action)
+                            </span>
+                            <span id="val4" class="text-xs font-mono text-blue-400 bg-blue-950/50 px-2 py-0.5 rounded border border-blue-800/50">24 node</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-2">Trật tự nhân quả & độ tinh vi trong cấu trúc mạng lưới thực tại.</p>
+                        <input type="range" id="slider4" min="12" max="40" step="2" value="24" class="w-full accent-blue-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- 5. Chánh Mạng -->
+                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-amber-500/40 transition-colors">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                                5. Chánh Mạng - Tốc độ Hầm Lượng Tử (Right Livelihood)
+                            </span>
+                            <span id="val5" class="text-xs font-mono text-amber-400 bg-amber-950/50 px-2 py-0.5 rounded border border-amber-800/50">1.0x</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-2">Sự nuôi dưỡng dòng chảy năng lượng sinh học cân bằng và bền vững.</p>
+                        <input type="range" id="slider5" min="0.2" max="3.0" step="0.2" value="1.0" class="w-full accent-amber-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- 6. Chánh Tinh Tấn -->
+                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-rose-500/40 transition-colors">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+                                6. Chánh Tinh Tấn - Tần số Xoắn (Right Effort)
+                            </span>
+                            <span id="val6" class="text-xs font-mono text-rose-400 bg-rose-950/50 px-2 py-0.5 rounded border border-rose-800/50">2.0 Hz</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-2">Độ bền bỉ, nghị lực tinh tấn làm biến đổi và làm sạch trường không gian.</p>
+                        <input type="range" id="slider6" min="0.5" max="5.0" step="0.5" value="2.0" class="w-full accent-rose-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- 7. Chánh Niệm -->
+                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-emerald-500/40 transition-colors">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                7. Chánh Niệm - Tâm Kỳ Dị (Right Mindfulness)
+                            </span>
+                            <span id="val7" class="text-xs font-mono text-emerald-400 bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-800/50">Center (0, 0)</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-2">Điểm neo giữ sự tỉnh thức tại trung tâm trường topo lượng tử.</p>
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            <div>
+                                <label class="text-[10px] text-slate-400 block mb-1">Trục X tâm</label>
+                                <input type="range" id="slider7x" min="-1" max="1" step="0.1" value="0" class="w-full accent-emerald-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 block mb-1">Trục Y tâm</label>
+                                <input type="range" id="slider7y" min="-1" max="1" step="0.1" value="0" class="w-full accent-emerald-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 8. Chánh Định -->
+                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-indigo-500/40 transition-colors">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                                8. Chánh Định - Đối Xứng Gấp Khúc (Right Concentration)
+                            </span>
+                            <span id="val8" class="text-xs font-mono text-indigo-400 bg-indigo-950/50 px-2 py-0.5 rounded border border-indigo-800/50">6-Fold Symmetry</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-2">Sự định tâm sâu sắc tạo nên cấu trúc đối xứng hoàn hảo của đa tạp (Manifold Symmetry).</p>
+                        <input type="range" id="slider8" min="3" max="12" step="1" value="6" class="w-full accent-indigo-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Column: Visualizer Canvas & Metrics -->
+        <section class="lg:col-span-5 flex flex-col gap-4">
+            <!-- Canvas Container -->
+            <div class="bg-topo-card/80 border border-slate-800/80 rounded-2xl p-4 shadow-xl backdrop-blur flex flex-col items-center">
+                <div class="w-full flex items-center justify-between mb-3">
+                    <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
+                        Topological Spacetime Mesh
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <button id="btnPause" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all">Tạm dừng</button>
+                        <button id="btnFullScreen" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all">Phóng to</button>
+                    </div>
+                </div>
+
+                <!-- Canvas -->
+                <div class="relative w-full aspect-square bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 shadow-inner flex items-center justify-center">
+                    <canvas id="topoCanvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <!-- Live Metrics Readout -->
+                <div class="grid grid-cols-3 gap-3 w-full mt-4 text-center">
+                    <div class="bg-slate-900/80 border border-slate-800/80 p-2.5 rounded-xl">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wide block">Độ Uốn Lưới</span>
+                        <span id="metricCurvature" class="text-sm font-bold font-mono text-purple-400">4.2 rad</span>
+                    </div>
+                    <div class="bg-slate-900/80 border border-slate-800/80 p-2.5 rounded-xl">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wide block">Năng lượng Topo</span>
+                        <span id="metricTopoEnergy" class="text-sm font-bold font-mono text-cyan-400">18.6 eV</span>
+                    </div>
+                    <div class="bg-slate-900/80 border border-slate-800/80 p-2.5 rounded-xl">
+                        <span class="text-[10px] text-slate-400 uppercase tracking-wide block">Tính Ổn Định</span>
+                        <span id="metricStability" class="text-sm font-bold font-mono text-emerald-400">96.4%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Philosophical & Topology Insight Card -->
+            <div class="bg-topo-card/80 border border-slate-800/80 rounded-2xl p-4 shadow-xl backdrop-blur">
+                <h3 class="text-sm font-semibold text-purple-400 mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Ý Nghĩa Topo & Bát Chánh Đạo
+                </h3>
+                <p id="insightText" class="text-xs text-slate-300 leading-relaxed">
+                    Trong toán học tô-pô (Topology), các vật thể có thể biến dạng liên tục mà không làm thay đổi bản chất hình học cốt lõi (như số lỗ Genus). Khi chiếu vào <span class="text-purple-400 font-semibold">Bát Chánh Đạo</span>, sự tu dưỡng chuyển hóa tâm thức chính là quá trình làm mượt mà và tối ưu hóa độ cong không-thời gian nội tâm, đưa trường năng lượng cá nhân hòa nhập vào cấu trúc bất biến của vũ trụ.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+        <p>Mô phỏng Đa tạp Topo & Ý thức Lượng tử tích hợp HTML5 Canvas.</p>
+    </footer>
+
+    <!-- Simulation & MP3 Audio Script -->
+    <script>
+        // --- AUDIO FLY SYSTEM CHO FILE MP3 LINK WEB & AUTO-PLAY ---
+        const bgAudio = document.getElementById('bgAudio');
+        const flyPlayer = document.getElementById('flyMusicPlayer');
+        const btnToggleMusic = document.getElementById('btnToggleMusic');
+        const musicIconWrapper = document.getElementById('musicIconWrapper');
+        const musicStatusText = document.getElementById('musicStatusText');
+        const playPauseIcon = document.getElementById('playPauseIcon');
+
+        let isPlayingMusic = false;
+
+        function toggleMusicPlayback() {
+            if (!isPlayingMusic) {
+                bgAudio.play().then(() => {
+                    isPlayingMusic = true;
+                    musicStatusText.textContent = "Đang phát nhạc nền";
+                    btnToggleMusic.textContent = "Dừng";
+                    btnToggleMusic.className = "ml-2 px-2.5 py-1.5 bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs font-medium transition-all";
+                    musicIconWrapper.classList.add('animate-spin-slow');
+                    playPauseIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
+                }).catch(error => {
+                    console.log("Trình duyệt chặn autoplay hoặc link mp3 lỗi:", error);
+                    musicStatusText.textContent = "Lỗi phát nhạc (Kiểm tra link)";
+                });
+            } else {
+                bgAudio.pause();
+                isPlayingMusic = false;
+                musicStatusText.textContent = "Đã tạm dừng";
+                btnToggleMusic.textContent = "Phát";
+                btnToggleMusic.className = "ml-2 px-2.5 py-1.5 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-medium transition-all";
+                musicIconWrapper.classList.remove('animate-spin-slow');
+                playPauseIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
+            }
+        }
+
+        btnToggleMusic.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMusicPlayback();
+        });
+
+        musicIconWrapper.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMusicPlayback();
+        });
+
+        // Tự động kích hoạt khi có sự kiện click/keydown đầu tiên trên trang (Auto-play unlock)
+        const autoPlayUnlockHandler = () => {
+            if (!isPlayingMusic) {
+                toggleMusicPlayback();
+            }
+            window.removeEventListener('click', autoPlayUnlockHandler);
+            window.removeEventListener('keydown', autoPlayUnlockHandler);
+        };
+
+        window.addEventListener('click', autoPlayUnlockHandler);
+        window.addEventListener('keydown', autoPlayUnlockHandler);
+
+
+        // --- TOPO SIMULATION SCRIPT ---
+        const canvas = document.getElementById('topoCanvas');
+        const ctx = canvas ? canvas.getContext('2d') : null;
+        if (!canvas || !ctx) {
+            console.error('Không thể khởi tạo canvas mô phỏng topo.');
+            throw new Error('Canvas 2D không khả dụng.');
+        }
+
+        let isRunning = true;
+        let time = 0;
+
+        let params = {
+            genus: 1,         
+            curvature: 1.0,   
+            amplitude: 20,    
+            resolution: 24,   
+            flowSpeed: 1.0,   
+            twistFreq: 2.0,   
+            focusX: 0.0,      
+            focusY: 0.0,      
+            symmetry: 6       
+        };
+
+        const sliders = {
+            1: document.getElementById('slider1'),
+            2: document.getElementById('slider2'),
+            3: document.getElementById('slider3'),
+            4: document.getElementById('slider4'),
+            5: document.getElementById('slider5'),
+            6: document.getElementById('slider6'),
+            '7x': document.getElementById('slider7x'),
+            '7y': document.getElementById('slider7y'),
+            8: document.getElementById('slider8')
+        };
+
+        const values = {
+            1: document.getElementById('val1'),
+            2: document.getElementById('val2'),
+            3: document.getElementById('val3'),
+            4: document.getElementById('val4'),
+            5: document.getElementById('val5'),
+            6: document.getElementById('val6'),
+            7: document.getElementById('val7'),
+            8: document.getElementById('val8')
+        };
+
+        const metricCurvature = document.getElementById('metricCurvature');
+        const metricTopoEnergy = document.getElementById('metricTopoEnergy');
+        const metricStability = document.getElementById('metricStability');
+        const topoStatus = document.getElementById('topoStatus');
+        const insightText = document.getElementById('insightText');
+
+        function updateParams() {
+            params.genus = parseInt(sliders[1].value);
+            params.curvature = parseFloat(sliders[2].value);
+            params.amplitude = parseInt(sliders[3].value);
+            params.resolution = parseInt(sliders[4].value);
+            params.flowSpeed = parseFloat(sliders[5].value);
+            params.twistFreq = parseFloat(sliders[6].value);
+            params.focusX = parseFloat(sliders['7x'].value);
+            params.focusY = parseFloat(sliders['7y'].value);
+            params.symmetry = parseInt(sliders[8].value);
+
+            let genusNames = {0: 'Genus 0 (Sphere)', 1: 'Genus 1 (Torus)', 2: 'Genus 2 (Double Torus)', 3: 'Genus 3 (Triple Torus)', 4: 'Genus 4 (Complex Manifold)'};
+            values[1].textContent = genusNames[params.genus] || `Genus ${params.genus}`;
+            values[2].textContent = params.curvature.toFixed(1) + ' K';
+            values[3].textContent = params.amplitude + ' px';
+            values[4].textContent = params.resolution + ' node';
+            values[5].textContent = params.flowSpeed.toFixed(1) + 'x';
+            values[6].textContent = params.twistFreq.toFixed(1) + ' Hz';
+            values[7].textContent = `(${params.focusX}, ${params.focusY})`;
+            values[8].textContent = `${params.symmetry}-Fold Symmetry`;
+
+            metricCurvature.textContent = (params.curvature * 2.5).toFixed(1) + ' rad';
+            let topoEnergyVal = (params.amplitude * 0.5 + Math.abs(params.curvature) * 5 + params.symmetry * 1.2).toFixed(1);
+            metricTopoEnergy.textContent = topoEnergyVal + ' eV';
+
+            let stabilityVal = Math.min(99.8, Math.max(70, (90 + Math.sin(params.symmetry * 0.5) * 8 - Math.abs(params.curvature) * 2)).toFixed(1));
+            metricStability.textContent = stabilityVal + '%';
+
+            if (stabilityVal > 94) {
+                topoStatus.textContent = "Trạng thái: Đa Tạp Topo Hoàn Hảo";
+                topoStatus.className = "text-xs px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 font-medium animate-pulse";
+            } else {
+                topoStatus.textContent = "Trạng thái: Lưới Đang Biến Dạng";
+                topoStatus.className = "text-xs px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-medium";
+            }
+        }
+
+        Object.values(sliders).forEach(slider => {
+            slider.addEventListener('input', updateParams);
+        });
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const dpr = Math.max(1, window.devicePixelRatio || 1);
+            canvas.width = Math.max(1, Math.round(rect.width * dpr));
+            canvas.height = Math.max(1, Math.round(rect.height * dpr));
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function drawTopology() {
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+            if (!width || !height) {
+                requestAnimationFrame(drawTopology);
+                return;
+            }
+
+            const cx = width / 2 + params.focusX * (width * 0.25);
+            const cy = height / 2 + params.focusY * (height * 0.25);
+
+            ctx.fillStyle = '#020617';
+            ctx.fillRect(0, 0, width, height);
+
+            const cols = params.resolution;
+            const rows = params.resolution;
+            const cellW = width / cols;
+            const cellH = height / rows;
+
+            let points = [];
+
+            for (let i = 0; i <= cols; i++) {
+                points[i] = [];
+                for (let j = 0; j <= rows; j++) {
+                    let x = i * cellW;
+                    let y = j * cellH;
+
+                    let dx = x - cx;
+                    let dy = y - cy;
+                    let r = Math.hypot(dx, dy);
+                    let theta = Math.atan2(dy, dx);
+
+                    let warp = Math.sin(r * 0.02 * params.curvature - time * params.flowSpeed) * params.amplitude;
+                    let multiHole = Math.cos(theta * params.symmetry + time * params.twistFreq * 0.2) * (params.genus * 8);
+                    
+                    let zOffset = warp + multiHole;
+
+                    let projX = x + Math.cos(theta) * (zOffset * 0.3);
+                    let projY = y + Math.sin(theta) * (zOffset * 0.3) + Math.sin(time * params.flowSpeed + i * 0.2) * 5;
+
+                    points[i][j] = { x: projX, y: projY, z: zOffset };
+                }
+            }
+
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= cols; i++) {
+                for (let j = 0; j <= rows; j++) {
+                    let p = points[i][j];
+                    let intensity = Math.min(1, Math.abs(p.z) / (params.amplitude + 15));
+
+                    if (i < cols) {
+                        let pNext = points[i + 1][j];
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(pNext.x, pNext.y);
+                        ctx.strokeStyle = `rgba(6, 182, 212, ${0.15 + intensity * 0.6})`;
+                        ctx.stroke();
+                    }
+
+                    if (j < rows) {
+                        let pDown = points[i][j + 1];
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(pDown.x, pDown.y);
+                        ctx.strokeStyle = `rgba(168, 85, 247, ${0.15 + intensity * 0.6})`;
+                        ctx.stroke();
+                    }
+
+                    if (i % 2 === 0 && j % 2 === 0) {
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, 1.5 + intensity * 2, 0, Math.PI * 2);
+                        ctx.fillStyle = intensity > 0.5 ? '#f59e0b' : '#06b6d4';
+                        ctx.fill();
+                    }
+                }
+            }
+
+            let vortexCount = params.symmetry;
+            for (let v = 0; v < vortexCount; v++) {
+                let vAngle = (v / vortexCount) * Math.PI * 2 + time * 0.3;
+                let vDist = 50 + Math.sin(time * 0.5 + v) * 25;
+                let vx = cx + Math.cos(vAngle) * vDist * (width / 400);
+                let vy = cy + Math.sin(vAngle) * vDist * (height / 400);
+
+                ctx.beginPath();
+                ctx.arc(vx, vy, 4 + Math.sin(time + v) * 2, 0, Math.PI * 2);
+                ctx.fillStyle = '#ec4899';
+                ctx.shadowColor = '#ec4899';
+                ctx.shadowBlur = 15;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            if (isRunning) {
+                time += 0.04 * params.flowSpeed;
+            }
+            requestAnimationFrame(drawTopology);
+        }
+
+        document.getElementById('btnPerfect').addEventListener('click', () => {
+            sliders[1].value = "2";    
+            sliders[2].value = "1.8";  
+            sliders[3].value = "35";   
+            sliders[4].value = "30";   
+            sliders[5].value = "2.0";  
+            sliders[6].value = "3.5";  
+            sliders['7x'].value = "0.0";
+            sliders['7y'].value = "0.0";
+            sliders[8].value = "8";    
+            updateParams();
+        });
+
+        document.getElementById('btnReset').addEventListener('click', () => {
+            sliders[1].value = "1";
+            sliders[2].value = "1.0";
+            sliders[3].value = "20";
+            sliders[4].value = "24";
+            sliders[5].value = "1.0";
+            sliders[6].value = "2.0";
+            sliders['7x'].value = "0.0";
+            sliders['7y'].value = "0.0";
+            sliders[8].value = "6";
+            updateParams();
+        });
+
+        const btnPause = document.getElementById('btnPause');
+        btnPause.addEventListener('click', () => {
+            isRunning = !isRunning;
+            btnPause.textContent = isRunning ? "Tạm dừng" : "Tiếp tục";
+            btnPause.classList.toggle('bg-purple-600', !isRunning);
+        });
+
+        document.getElementById('btnFullScreen').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                canvas.parentElement.requestFullscreen().catch(err => {
+                    console.log(err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        updateParams();
+        requestAnimationFrame(drawTopology);
+    </script>
+</body>
+</html>
