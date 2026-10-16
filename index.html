@@ -1,603 +1,196 @@
-<!DOCTYPE html>
-<html lang="vi" class="dark">
+<!doctype html>
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mô Phỏng Lý Thuyết Dây</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        topo: {
-                            bg: '#020617',
-                            card: '#090d16',
-                            cyan: '#06b6d4',
-                            teal: '#14b8a6',
-                            gold: '#f59e0b',
-                            magenta: '#ec4899',
-                            purple: '#a855f7'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #020617; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #334155; }
-        @keyframes spin-slow {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        .animate-spin-slow {
-            animation: spin-slow 8s linear infinite;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080816">
+<title>Vũ Trụ Hợp Nhất | Không Gian Mô Phỏng</title>
+<style>
+  :root{color-scheme:dark;--bg:#060611;--line:rgba(255,255,255,.12);--gold:#f4d477;--cyan:#46e6e8;--muted:#a3a8bd}
+  *{box-sizing:border-box}
+  html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:#f3f4fa;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+  body{height:100vh;height:100dvh;display:flex;flex-direction:column}
+  .app-header{position:relative;z-index:10;flex:none;display:grid;grid-template-columns:minmax(195px,1fr) auto;align-items:center;gap:12px 18px;padding:12px 18px;background:linear-gradient(110deg,rgba(8,8,23,.99),rgba(18,16,43,.97),rgba(8,8,23,.99));border-bottom:1px solid rgba(244,212,119,.2);box-shadow:0 12px 30px rgba(0,0,0,.24)}
+  .brand{display:flex;align-items:center;gap:11px;min-width:0}.brand-mark{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:14px;font-size:23px;color:var(--gold);background:linear-gradient(145deg,rgba(244,212,119,.2),rgba(70,230,232,.1));border:1px solid rgba(244,212,119,.35)}
+  .brand-copy{min-width:0}.brand-title{display:block;font-size:14px;line-height:1.3;font-weight:800;letter-spacing:.045em;background:linear-gradient(90deg,#ffe7a1,#fff,#85f5f0);color:transparent;background-clip:text;-webkit-background-clip:text}.brand-subtitle{display:block;margin-top:3px;font-size:10px;color:var(--muted);letter-spacing:.07em}
+  .tabs{grid-column:1/-1;display:flex;align-items:center;gap:7px;padding:5px;border:1px solid var(--line);background:rgba(0,0,0,.24);border-radius:15px;min-width:0}
+  .tab{display:flex;align-items:center;justify-content:center;gap:8px;flex:1 1 0;min-height:42px;padding:7px 12px;border:1px solid transparent;border-radius:11px;color:#b9bdd0;background:transparent;font-family:inherit;font-size:12px;font-weight:600;line-height:1.2;cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s,color .2s}
+  .tab:hover{color:white;background:rgba(255,255,255,.055)}.tab:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}.tab[aria-selected="true"]{color:#fff4cf;border-color:rgba(244,212,119,.32);background:linear-gradient(135deg,rgba(244,212,119,.16),rgba(168,85,247,.12));box-shadow:0 4px 18px rgba(0,0,0,.18)}
+  .tab-icon{display:inline-grid;place-items:center;width:20px;height:20px;color:var(--gold);font-size:18px}.tab[data-view="light"] .tab-icon{color:var(--cyan)}.tab[data-view="geometry"] .tab-icon{color:#c3a0ff}
+  .status{position:absolute;right:18px;top:18px;display:flex;align-items:center;gap:8px;padding:8px 10px;color:#bac0d0;font-size:10px;letter-spacing:.08em;white-space:nowrap;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025)}.status-dot{width:7px;height:7px;display:inline-block;flex:none;border-radius:50%;background:#65e8c4;box-shadow:0 0 10px rgba(101,232,196,.6)}
+  main{position:relative;flex:1 1 auto;min-width:0;min-height:0;overflow:hidden;background:#03030c}#simulation-frame{display:block;width:100%;height:100%;border:0;background:#03030c}
+  #flyMusicPlayer{position:fixed;right:18px;bottom:18px;z-index:100;display:flex;align-items:center;gap:10px;max-width:calc(100vw - 24px);padding:10px 12px;background:rgba(9,13,25,.94);border:1px solid rgba(168,85,247,.42);border-radius:18px;box-shadow:0 14px 38px rgba(0,0,0,.42),0 0 24px rgba(168,85,247,.12);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);transition:border-color .2s}
+  #flyMusicPlayer:hover{border-color:rgba(168,85,247,.8)}#musicIconWrapper{width:42px;height:42px;flex:none;border-radius:50%;padding:2px;display:grid;place-items:center;cursor:pointer;background:conic-gradient(from 0deg,#a855f7,#06b6d4,#f59e0b,#a855f7);box-shadow:0 0 18px rgba(168,85,247,.18)}#vinylCenter{width:100%;height:100%;border-radius:50%;background:#020617;display:grid;place-items:center}#playPauseIcon{width:21px;height:21px;color:#c4b5fd}.animate-spin-slow{animation:spin-slow 4s linear infinite}@keyframes spin-slow{to{transform:rotate(360deg)}}
+  .music-copy{display:flex;flex-direction:column;gap:3px;min-width:0}.music-title{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#e5e7eb;white-space:nowrap}.music-dot{width:6px;height:6px;flex:none;border-radius:50%;background:#34d399}.music-status{max-width:180px;font-size:10px;color:#9ca3af;line-height:1.3}.music-button{margin-left:2px;padding:8px 11px;border:1px solid rgba(168,85,247,.35);border-radius:11px;background:rgba(147,51,234,.2);color:#ddd6fe;font-size:11px;font-weight:700;cursor:pointer;transition:background .2s}.music-button:hover{background:rgba(147,51,234,.36)}.music-button[aria-pressed="true"]{color:#a7f3d0;background:rgba(16,185,129,.16);border-color:rgba(52,211,153,.35)}
+  @media(min-width:1100px){.app-header{grid-template-columns:minmax(225px,1fr) minmax(470px,1.8fr) auto}.tabs{grid-column:auto}.status{position:static;justify-self:end}.tab{white-space:normal}}
+  @media(max-width:640px){.app-header{padding:8px 9px;gap:8px}.brand{gap:8px;padding-right:95px}.brand-mark{width:34px;height:34px;border-radius:10px;font-size:19px}.brand-title{font-size:11px;letter-spacing:.01em}.brand-subtitle{font-size:8px;letter-spacing:0}.status{top:12px;right:9px;padding:7px;font-size:8px;gap:5px}.tabs{gap:3px;padding:4px;border-radius:12px}.tab{min-height:43px;gap:4px;padding:5px 4px;font-size:10px;white-space:normal;text-align:center;flex-direction:column}.tab-icon{height:17px;font-size:17px}#flyMusicPlayer{right:9px;bottom:9px;padding:8px;gap:7px;border-radius:15px}#musicIconWrapper{width:36px;height:36px}.music-title{font-size:10px}.music-status{font-size:9px;max-width:135px}.music-button{padding:8px 9px;font-size:10px}}
+  @media(prefers-reduced-motion:reduce){.tab,#flyMusicPlayer,.music-button{transition:none}.animate-spin-slow{animation-duration:12s}}
+</style>
 </head>
-<body class="bg-topo-bg text-slate-100 min-h-screen flex flex-col antialiased selection:bg-purple-500 selection:text-black">
+<body>
+<header class="app-header">
+  <div class="brand" aria-label="Không gian mô phỏng vũ trụ hợp nhất">
+    <div class="brand-mark" aria-hidden="true">✦</div>
+    <div class="brand-copy"><strong class="brand-title">VŨ TRỤ HỢP NHẤT</strong><span class="brand-subtitle">KHÔNG GIAN MÔ PHỎNG TƯƠNG TÁC</span></div>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Chọn mô phỏng">
+    <button class="tab" type="button" role="tab" id="tab-topology" data-view="topology" aria-selected="true" aria-controls="simulation-frame"><span class="tab-icon" aria-hidden="true">◎</span><span>Topo &amp; Bát Chánh Đạo</span></button>
+    <button class="tab" type="button" role="tab" id="tab-light" data-view="light" aria-selected="false" aria-controls="simulation-frame"><span class="tab-icon" aria-hidden="true">◉</span><span>Ánh Sáng &amp; Tánh Không</span></button>
+    <button class="tab" type="button" role="tab" id="tab-geometry" data-view="geometry" aria-selected="false" aria-controls="simulation-frame"><span class="tab-icon" aria-hidden="true">⬡</span><span>Hình Học Thiêng Liêng</span></button>
+  </nav>
+  <div class="status"><span class="status-dot" aria-hidden="true"></span><span>3 MÔ PHỎNG</span></div>
+</header>
+<main><iframe id="simulation-frame" title="Mô phỏng Topo và Bát Chánh Đạo" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe></main>
 
-    <!-- Audio Player Fly Widget (Fixed Bottom-Right) -->
-    <div id="flyMusicPlayer" class="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-topo-card/90 border border-purple-500/30 backdrop-blur-xl px-4 py-3 rounded-2xl shadow-2xl shadow-purple-500/10 transition-all duration-300 hover:border-purple-500/60">
-        <!-- Vinyl / CD Icon Spin Effect -->
-        <div id="musicIconWrapper" class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 via-cyan-500 to-amber-400 p-0.5 flex items-center justify-center cursor-pointer shadow-md">
-            <div id="vinylCenter" class="w-full h-full bg-slate-950 rounded-full flex items-center justify-center">
-                <svg id="playPauseIcon" class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-        </div>
+<!-- Một trình phát nhạc nổi dùng chung cho cả ba mô phỏng -->
+<div id="flyMusicPlayer" aria-label="Trình phát nhạc nền">
+  <div id="musicIconWrapper" title="Phát hoặc tạm dừng nhạc" role="button" tabindex="0" aria-label="Phát nhạc nền">
+    <div id="vinylCenter"><svg id="playPauseIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6v12l10-6z" fill="currentColor" stroke="none"/></svg></div>
+  </div>
+  <div class="music-copy"><span class="music-title"><span>Nhạc Nền Vũ Trụ</span><span class="music-dot" aria-hidden="true"></span></span><span id="musicStatusText" class="music-status" role="status" aria-live="polite">Đang thử tự phát nhạc…</span></div>
+  <button id="btnToggleMusic" class="music-button" type="button" aria-pressed="false">Phát</button>
+  <audio id="bgAudio" loop preload="auto" autoplay playsinline><source src="./mp3/universal-path.mp3" type="audio/mpeg">Trình duyệt không hỗ trợ phát âm thanh.</audio>
+</div>
 
-        <div class="flex flex-col">
-            <span class="text-xs font-semibold text-slate-200 flex items-center gap-1">
-                <span>Nhạc Nền Topo</span>
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            </span>
-            <span id="musicStatusText" class="text-[10px] text-slate-400">Nhấn để phát nhạc</span>
-        </div>
+<script>
+const apps = {
+  topology: "<!DOCTYPE html>\n<html lang=\"vi\" class=\"dark\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Mô Phỏng Lý Thuyết Dây</title>\n    <!-- Tailwind CSS -->\n    <script src=\"https://cdn.tailwindcss.com\"><\/script>\n    <script>\n        tailwind.config = {\n            darkMode: 'class',\n            theme: {\n                extend: {\n                    colors: {\n                        topo: {\n                            bg: '#020617',\n                            card: '#090d16',\n                            cyan: '#06b6d4',\n                            teal: '#14b8a6',\n                            gold: '#f59e0b',\n                            magenta: '#ec4899',\n                            purple: '#a855f7'\n                        }\n                    }\n                }\n            }\n        }\n    <\/script>\n    <!-- Google Fonts: Inter -->\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <style>\n        body { font-family: 'Inter', sans-serif; }\n        ::-webkit-scrollbar { width: 6px; }\n        ::-webkit-scrollbar-track { background: #020617; }\n        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }\n        ::-webkit-scrollbar-thumb:hover { background: #334155; }\n        @keyframes spin-slow {\n            from { transform: rotate(0deg); }\n            to { transform: rotate(360deg); }\n        }\n        .animate-spin-slow {\n            animation: spin-slow 8s linear infinite;\n        }\n    </style>\n</head>\n<body class=\"bg-topo-bg text-slate-100 min-h-screen flex flex-col antialiased selection:bg-purple-500 selection:text-black\">\n\n    <!-- Header -->\n    <header class=\"border-b border-slate-800 bg-topo-card/75 backdrop-blur-md sticky top-0 z-50 px-4 py-3\">\n        <div class=\"max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4\">\n            <div class=\"flex items-center gap-3\">\n                <div class=\"w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-cyan-500 to-amber-400 flex items-center justify-center shadow-lg shadow-purple-500/20\">\n                    <svg class=\"w-6 h-6 text-slate-950\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\">\n                        <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10\"></path>\n                    </svg>\n                </div>\n                <div>\n                    <h1 class=\"font-bold text-lg bg-gradient-to-r from-purple-400 via-cyan-300 to-amber-300 bg-clip-text text-transparent\">Quantum Topology & Noble Path</h1>\n                    <p class=\"text-xs text-slate-400\">Mô phỏng Biến dạng Không-thời gian, Độ uốn cong Topo & Bát Chánh Đạo</p>\n                </div>\n            </div>\n            \n            <div class=\"flex items-center gap-2\">\n                <button id=\"btnPerfect\" class=\"px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-purple-500/20 transition-all transform active:scale-95 flex items-center gap-2\">\n                    <svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M13 10V3L4 14h7v7l9-11h-7z\"/></svg>\n                    Không Gian Topo Viên Mãn\n                </button>\n                <button id=\"btnReset\" class=\"px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-sm rounded-xl transition-all\">\n                    Đặt lại\n                </button>\n            </div>\n        </div>\n    </header>\n\n    <!-- Main Content Grid -->\n    <main class=\"flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start\">\n        \n        <!-- Left Column: Controls -->\n        <section class=\"lg:col-span-7 flex flex-col gap-4\">\n            <div class=\"bg-topo-card/80 border border-slate-800/80 rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur\">\n                <div class=\"flex items-center justify-between mb-4 pb-3 border-b border-slate-800\">\n                    <h2 class=\"font-semibold text-base flex items-center gap-2 text-purple-400\">\n                        <svg class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4\"/></svg>\n                        Bảng Điều Khiển Thông Số Topo Học\n                    </h2>\n                    <span id=\"topoStatus\" class=\"text-xs px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-medium\">Trạng thái: Lưới Đa Chiều Ổn Định</span>\n                </div>\n\n                <div class=\"space-y-4 max-h-[600px] overflow-y-auto pr-1\">\n                    \n                    <!-- 1. Chánh Kiến -->\n                    <div class=\"p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-purple-500/40 transition-colors\">\n                        <div class=\"flex justify-between items-center mb-1.5\">\n                            <span class=\"font-medium text-sm text-slate-200 flex items-center gap-2\">\n                                <span class=\"w-2 h-2 rounded-full bg-purple-400\"></span>\n                                1. Chánh Kiến - Hệ số Genus (Right View)\n                            </span>\n                            <span id=\"val1\" class=\"text-xs font-mono text-purple-400 bg-purple-950/50 px-2 py-0.5 rounded border border-purple-800/50\">Genus 1 (Torus)</span>\n                        </div>\n                        <p class=\"text-xs text-slate-400 mb-2\">Định hình cấu trúc hình học nền tảng của không gian (Số lỗ xuyên qua mặt phẳng topo).</p>\n                        <input type=\"range\" id=\"slider1\" min=\"0\" max=\"4\" step=\"1\" value=\"1\" class=\"w-full accent-purple-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer\">\n                    </div>\n\n                    <!-- 2. Chánh Tư Duy -->\n                    <div class=\"p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-cyan-500/40 transition-colors\">\n                        <div class=\"flex justify-between items-center mb-1.5\">\n                            <span class=\"font-medium text-sm text-slate-200 flex items-center gap-2\">\n                                <span class=\"w-2 h-2 rounded-full bg-cyan-400\"></span>\n                                2. Chánh Tư Duy - Độ Uốn Gauss (Right Intention)\n                            </span>\n                            <span id=\"val2\" class=\"text-xs font-mono text-cyan-400 bg-cyan-950/50 px-2 py-0.5 rounded border border-cyan-800/50\">1.0 K</span>\n                        </div>\n                        <p class=\"text-xs text-slate-400 mb-2\">Độ cong không-thời gian hướng ý niệm nội tại (Dương: Hình cầu, Âm: Yên ngựa).</p>\n                        <input type=\"range\" id=\"slider2\" min=\"-2\" max=\"2\" step=\"0.2\" value=\"1.0\" class=\"w-full accent-cyan-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer\">\n                    </div>\n\n                    <!-- 3. Chánh Ngữ -->\n                    <div class=\"p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-teal-500/40 transition-colors\">\n                        <div class=\"flex justify-between items-center mb-1.5\">\n                            <span class=\"font-medium text-sm text-slate-200 flex items-center gap-2\">\n                                <span class=\"w-2 h-2 rounded-full bg-teal-400\"></span>\n                                3. Chánh Ngữ - Biên độ Sóng Lưới (Right Speech)\n                            </span>\n                            <span id=\"val3\" class=\"text-xs font-mono text-teal-400 bg-teal-950/50 px-2 py-0.5 rounded border border-teal-800/50\">20 px</span>\n                        </div>\n                        <p class=\"text-xs text-slate-400 mb-2\">Sự truyền tải năng lượng ngôn từ qua các chiều sóng không gian.</p>\n                        <input type=\"range\" id=\"slider3\" min=\"5\" max=\"50\" step=\"1\" value=\"20\" class=\"w-full accent-teal-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer\">\n                    </div>\n\n                    <!-- 4. Chánh Nghiệp -->\n                    <div class=\"p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-blue-500/40 transition-colors\">\n                        <div class=\"flex justify-between items-center mb-1.5\">\n                            <span class=\"font-medium text-sm text-slate-200 flex items-center gap-2\">\n                                <span class=\"w-2 h-2 rounded-full bg-blue-400\"></span>\n                                4. Chánh Nghiệp - Mật độ Lưới (Right Action)\n                            </span>\n                            <span id=\"val4\" class=\"text-xs font-mono text-blue-400 bg-blue-950/50 px-2 py-0.5 rounded border border-blue-800/50\">24 node</span>\n                        </div>\n                        <p class=\"text-xs text-slate-400 mb-2\">Trật tự nhân quả & độ tinh vi trong cấu trúc mạng lưới thực tại.</p>\n                        <input type=\"range\" id=\"slider4\" min=\"12\" max=\"40\" step=\"2\" value=\"24\" class=\"w-full accent-blue-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer\">\n                    </div>\n\n                    <!-- 5. Chánh Mạng -->\n                    <div class=\"p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-amber-500/40 transition-colors\">\n                        <div class=\"flex justify-between items-center mb-1.5\">\n                            <span class=\"font-medium text-sm text-slate-200 flex items-center gap-2\">\n                                <span class=\"w-2 h-2 rounded-full bg-amber-400\"></span>\n                                5. Chánh Mạng - Tốc độ Hầm Lượng Tử (Right Livelihood)\n                            </span>\n                            <span id=\"val5\" class=\"text-xs font-mono text-amber-400 bg-amber-950/50 px-2 py-0.5 rounded border border-amber-800/50\">1.0x</span>\n                        </div>\n                        <p class=\"text-xs text-slate-400 mb-2\">Sự nuôi dưỡng dòng chảy năng lượng sinh học cân bằng và bền vững.</p>\n                        <input type=\"range\" id=\"slider5\" min=\"0.2\" max=\"3.0\" step=\"0.2\" value=\"1.0\" class=\"w-full accent-amber-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer\">\n                    </div>\n\n                    <!-- 6. Chánh Tinh Tấn -->\n                    <div class=\"p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-rose-500/40 transition-colors\">\n                        <div class=\"flex justify-between items-center mb-1.5\">\n                            <span class=\"font-medium text-sm text-slate-200 flex items-center gap-2\">\n                                <span class=\"w-2 h-2 rounded-full bg-rose-400\"></span>\n                                6. Chánh Tinh Tấn - Tần số Xoắn (Right Effort)\n                            </span>\n                            <span id=\"val6\" class=\"text-xs font-mono text-rose-400 bg-rose-950/50 px-2 py-0.5 rounded border border-rose-800/50\">2.0 Hz</span>\n                        </div>\n                        <p class=\"text-xs text-slate-400 mb-2\">Độ bền bỉ, nghị lực tinh tấn làm biến đổi và làm sạch trường không gian.</p>\n                        <input type=\"range\" id=\"slider6\" min=\"0.5\" max=\"5.0\" step=\"0.5\" value=\"2.0\" class=\"w-full accent-rose-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer\">\n                    </div>\n\n                    <!-- 7. Chánh Niệm -->\n                    <div class=\"p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-emerald-500/40 transition-colors\">\n                        <div class=\"flex justify-between items-center mb-1.5\">\n                            <span class=\"font-medium text-sm text-slate-200 flex items-center gap-2\">\n                                <span class=\"w-2 h-2 rounded-full bg-emerald-400\"></span>\n                                7. Chánh Niệm - Tâm Kỳ Dị (Right Mindfulness)\n                            </span>\n                            <span id=\"val7\" class=\"text-xs font-mono text-emerald-400 bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-800/50\">Center (0, 0)</span>\n                        </div>\n                        <p class=\"text-xs text-slate-400 mb-2\">Điểm neo giữ sự tỉnh thức tại trung tâm trường topo lượng tử.</p>\n                        <div class=\"grid grid-cols-2 gap-2 mt-2\">\n                            <div>\n                                <label class=\"text-[10px] text-slate-400 block mb-1\">Trục X tâm</label>\n                                <input type=\"range\" id=\"slider7x\" min=\"-1\" max=\"1\" step=\"0.1\" value=\"0\" class=\"w-full accent-emerald-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer\">\n                            </div>\n                            <div>\n                                <label class=\"text-[10px] text-slate-400 block mb-1\">Trục Y tâm</label>\n                                <input type=\"range\" id=\"slider7y\" min=\"-1\" max=\"1\" step=\"0.1\" value=\"0\" class=\"w-full accent-emerald-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer\">\n                            </div>\n                        </div>\n                    </div>\n\n                    <!-- 8. Chánh Định -->\n                    <div class=\"p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-indigo-500/40 transition-colors\">\n                        <div class=\"flex justify-between items-center mb-1.5\">\n                            <span class=\"font-medium text-sm text-slate-200 flex items-center gap-2\">\n                                <span class=\"w-2 h-2 rounded-full bg-indigo-400\"></span>\n                                8. Chánh Định - Đối Xứng Gấp Khúc (Right Concentration)\n                            </span>\n                            <span id=\"val8\" class=\"text-xs font-mono text-indigo-400 bg-indigo-950/50 px-2 py-0.5 rounded border border-indigo-800/50\">6-Fold Symmetry</span>\n                        </div>\n                        <p class=\"text-xs text-slate-400 mb-2\">Sự định tâm sâu sắc tạo nên cấu trúc đối xứng hoàn hảo của đa tạp (Manifold Symmetry).</p>\n                        <input type=\"range\" id=\"slider8\" min=\"3\" max=\"12\" step=\"1\" value=\"6\" class=\"w-full accent-indigo-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer\">\n                    </div>\n\n                </div>\n            </div>\n        </section>\n\n        <!-- Right Column: Visualizer Canvas & Metrics -->\n        <section class=\"lg:col-span-5 flex flex-col gap-4\">\n            <!-- Canvas Container -->\n            <div class=\"bg-topo-card/80 border border-slate-800/80 rounded-2xl p-4 shadow-xl backdrop-blur flex flex-col items-center\">\n                <div class=\"w-full flex items-center justify-between mb-3\">\n                    <span class=\"text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2\">\n                        <span class=\"w-2 h-2 rounded-full bg-purple-400 animate-ping\"></span>\n                        Topological Spacetime Mesh\n                    </span>\n                    <div class=\"flex items-center gap-2\">\n                        <button id=\"btnPause\" class=\"px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all\">Tạm dừng</button>\n                        <button id=\"btnFullScreen\" class=\"px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all\">Phóng to</button>\n                    </div>\n                </div>\n\n                <!-- Canvas -->\n                <div class=\"relative w-full aspect-square bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 shadow-inner flex items-center justify-center\">\n                    <canvas id=\"topoCanvas\" class=\"w-full h-full block\"></canvas>\n                </div>\n\n                <!-- Live Metrics Readout -->\n                <div class=\"grid grid-cols-3 gap-3 w-full mt-4 text-center\">\n                    <div class=\"bg-slate-900/80 border border-slate-800/80 p-2.5 rounded-xl\">\n                        <span class=\"text-[10px] text-slate-400 uppercase tracking-wide block\">Độ Uốn Lưới</span>\n                        <span id=\"metricCurvature\" class=\"text-sm font-bold font-mono text-purple-400\">4.2 rad</span>\n                    </div>\n                    <div class=\"bg-slate-900/80 border border-slate-800/80 p-2.5 rounded-xl\">\n                        <span class=\"text-[10px] text-slate-400 uppercase tracking-wide block\">Năng lượng Topo</span>\n                        <span id=\"metricTopoEnergy\" class=\"text-sm font-bold font-mono text-cyan-400\">18.6 eV</span>\n                    </div>\n                    <div class=\"bg-slate-900/80 border border-slate-800/80 p-2.5 rounded-xl\">\n                        <span class=\"text-[10px] text-slate-400 uppercase tracking-wide block\">Tính Ổn Định</span>\n                        <span id=\"metricStability\" class=\"text-sm font-bold font-mono text-emerald-400\">96.4%</span>\n                    </div>\n                </div>\n            </div>\n\n            <!-- Philosophical & Topology Insight Card -->\n            <div class=\"bg-topo-card/80 border border-slate-800/80 rounded-2xl p-4 shadow-xl backdrop-blur\">\n                <h3 class=\"text-sm font-semibold text-purple-400 mb-2 flex items-center gap-2\">\n                    <svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"/></svg>\n                    Ý Nghĩa Topo & Bát Chánh Đạo\n                </h3>\n                <p id=\"insightText\" class=\"text-xs text-slate-300 leading-relaxed\">\n                    Trong toán học tô-pô (Topology), các vật thể có thể biến dạng liên tục mà không làm thay đổi bản chất hình học cốt lõi (như số lỗ Genus). Khi chiếu vào <span class=\"text-purple-400 font-semibold\">Bát Chánh Đạo</span>, sự tu dưỡng chuyển hóa tâm thức chính là quá trình làm mượt mà và tối ưu hóa độ cong không-thời gian nội tâm, đưa trường năng lượng cá nhân hòa nhập vào cấu trúc bất biến của vũ trụ.\n                </p>\n            </div>\n        </section>\n\n    </main>\n\n    <!-- Footer -->\n    <footer class=\"border-t border-slate-800 py-4 text-center text-xs text-slate-500\">\n        <p>Mô phỏng Đa tạp Topo & Ý thức Lượng tử tích hợp HTML5 Canvas.</p>\n    </footer>\n\n    <!-- Simulation & MP3 Audio Script -->\n    <script>\n        // --- TOPO SIMULATION SCRIPT ---\n        const canvas = document.getElementById('topoCanvas');\n        const ctx = canvas ? canvas.getContext('2d') : null;\n        if (!canvas || !ctx) {\n            console.error('Không thể khởi tạo canvas mô phỏng topo.');\n            throw new Error('Canvas 2D không khả dụng.');\n        }\n\n        let isRunning = true;\n        let time = 0;\n\n        let params = {\n            genus: 1,         \n            curvature: 1.0,   \n            amplitude: 20,    \n            resolution: 24,   \n            flowSpeed: 1.0,   \n            twistFreq: 2.0,   \n            focusX: 0.0,      \n            focusY: 0.0,      \n            symmetry: 6       \n        };\n\n        const sliders = {\n            1: document.getElementById('slider1'),\n            2: document.getElementById('slider2'),\n            3: document.getElementById('slider3'),\n            4: document.getElementById('slider4'),\n            5: document.getElementById('slider5'),\n            6: document.getElementById('slider6'),\n            '7x': document.getElementById('slider7x'),\n            '7y': document.getElementById('slider7y'),\n            8: document.getElementById('slider8')\n        };\n\n        const values = {\n            1: document.getElementById('val1'),\n            2: document.getElementById('val2'),\n            3: document.getElementById('val3'),\n            4: document.getElementById('val4'),\n            5: document.getElementById('val5'),\n            6: document.getElementById('val6'),\n            7: document.getElementById('val7'),\n            8: document.getElementById('val8')\n        };\n\n        const metricCurvature = document.getElementById('metricCurvature');\n        const metricTopoEnergy = document.getElementById('metricTopoEnergy');\n        const metricStability = document.getElementById('metricStability');\n        const topoStatus = document.getElementById('topoStatus');\n        const insightText = document.getElementById('insightText');\n\n        function updateParams() {\n            params.genus = parseInt(sliders[1].value);\n            params.curvature = parseFloat(sliders[2].value);\n            params.amplitude = parseInt(sliders[3].value);\n            params.resolution = parseInt(sliders[4].value);\n            params.flowSpeed = parseFloat(sliders[5].value);\n            params.twistFreq = parseFloat(sliders[6].value);\n            params.focusX = parseFloat(sliders['7x'].value);\n            params.focusY = parseFloat(sliders['7y'].value);\n            params.symmetry = parseInt(sliders[8].value);\n\n            let genusNames = {0: 'Genus 0 (Sphere)', 1: 'Genus 1 (Torus)', 2: 'Genus 2 (Double Torus)', 3: 'Genus 3 (Triple Torus)', 4: 'Genus 4 (Complex Manifold)'};\n            values[1].textContent = genusNames[params.genus] || `Genus ${params.genus}`;\n            values[2].textContent = params.curvature.toFixed(1) + ' K';\n            values[3].textContent = params.amplitude + ' px';\n            values[4].textContent = params.resolution + ' node';\n            values[5].textContent = params.flowSpeed.toFixed(1) + 'x';\n            values[6].textContent = params.twistFreq.toFixed(1) + ' Hz';\n            values[7].textContent = `(${params.focusX}, ${params.focusY})`;\n            values[8].textContent = `${params.symmetry}-Fold Symmetry`;\n\n            metricCurvature.textContent = (params.curvature * 2.5).toFixed(1) + ' rad';\n            let topoEnergyVal = (params.amplitude * 0.5 + Math.abs(params.curvature) * 5 + params.symmetry * 1.2).toFixed(1);\n            metricTopoEnergy.textContent = topoEnergyVal + ' eV';\n\n            let stabilityVal = Math.min(99.8, Math.max(70, (90 + Math.sin(params.symmetry * 0.5) * 8 - Math.abs(params.curvature) * 2)).toFixed(1));\n            metricStability.textContent = stabilityVal + '%';\n\n            if (stabilityVal > 94) {\n                topoStatus.textContent = \"Trạng thái: Đa Tạp Topo Hoàn Hảo\";\n                topoStatus.className = \"text-xs px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 font-medium animate-pulse\";\n            } else {\n                topoStatus.textContent = \"Trạng thái: Lưới Đang Biến Dạng\";\n                topoStatus.className = \"text-xs px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-medium\";\n            }\n        }\n\n        Object.values(sliders).forEach(slider => {\n            slider.addEventListener('input', updateParams);\n        });\n\n        function resizeCanvas() {\n            const rect = canvas.parentElement.getBoundingClientRect();\n            const dpr = Math.max(1, window.devicePixelRatio || 1);\n            canvas.width = Math.max(1, Math.round(rect.width * dpr));\n            canvas.height = Math.max(1, Math.round(rect.height * dpr));\n            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);\n        }\n        window.addEventListener('resize', resizeCanvas);\n        resizeCanvas();\n\n        function drawTopology() {\n            const width = canvas.clientWidth;\n            const height = canvas.clientHeight;\n            if (!width || !height) {\n                requestAnimationFrame(drawTopology);\n                return;\n            }\n\n            const cx = width / 2 + params.focusX * (width * 0.25);\n            const cy = height / 2 + params.focusY * (height * 0.25);\n\n            ctx.fillStyle = '#020617';\n            ctx.fillRect(0, 0, width, height);\n\n            const cols = params.resolution;\n            const rows = params.resolution;\n            const cellW = width / cols;\n            const cellH = height / rows;\n\n            let points = [];\n\n            for (let i = 0; i <= cols; i++) {\n                points[i] = [];\n                for (let j = 0; j <= rows; j++) {\n                    let x = i * cellW;\n                    let y = j * cellH;\n\n                    let dx = x - cx;\n                    let dy = y - cy;\n                    let r = Math.hypot(dx, dy);\n                    let theta = Math.atan2(dy, dx);\n\n                    let warp = Math.sin(r * 0.02 * params.curvature - time * params.flowSpeed) * params.amplitude;\n                    let multiHole = Math.cos(theta * params.symmetry + time * params.twistFreq * 0.2) * (params.genus * 8);\n                    \n                    let zOffset = warp + multiHole;\n\n                    let projX = x + Math.cos(theta) * (zOffset * 0.3);\n                    let projY = y + Math.sin(theta) * (zOffset * 0.3) + Math.sin(time * params.flowSpeed + i * 0.2) * 5;\n\n                    points[i][j] = { x: projX, y: projY, z: zOffset };\n                }\n            }\n\n            ctx.lineWidth = 1;\n            for (let i = 0; i <= cols; i++) {\n                for (let j = 0; j <= rows; j++) {\n                    let p = points[i][j];\n                    let intensity = Math.min(1, Math.abs(p.z) / (params.amplitude + 15));\n\n                    if (i < cols) {\n                        let pNext = points[i + 1][j];\n                        ctx.beginPath();\n                        ctx.moveTo(p.x, p.y);\n                        ctx.lineTo(pNext.x, pNext.y);\n                        ctx.strokeStyle = `rgba(6, 182, 212, ${0.15 + intensity * 0.6})`;\n                        ctx.stroke();\n                    }\n\n                    if (j < rows) {\n                        let pDown = points[i][j + 1];\n                        ctx.beginPath();\n                        ctx.moveTo(p.x, p.y);\n                        ctx.lineTo(pDown.x, pDown.y);\n                        ctx.strokeStyle = `rgba(168, 85, 247, ${0.15 + intensity * 0.6})`;\n                        ctx.stroke();\n                    }\n\n                    if (i % 2 === 0 && j % 2 === 0) {\n                        ctx.beginPath();\n                        ctx.arc(p.x, p.y, 1.5 + intensity * 2, 0, Math.PI * 2);\n                        ctx.fillStyle = intensity > 0.5 ? '#f59e0b' : '#06b6d4';\n                        ctx.fill();\n                    }\n                }\n            }\n\n            let vortexCount = params.symmetry;\n            for (let v = 0; v < vortexCount; v++) {\n                let vAngle = (v / vortexCount) * Math.PI * 2 + time * 0.3;\n                let vDist = 50 + Math.sin(time * 0.5 + v) * 25;\n                let vx = cx + Math.cos(vAngle) * vDist * (width / 400);\n                let vy = cy + Math.sin(vAngle) * vDist * (height / 400);\n\n                ctx.beginPath();\n                ctx.arc(vx, vy, 4 + Math.sin(time + v) * 2, 0, Math.PI * 2);\n                ctx.fillStyle = '#ec4899';\n                ctx.shadowColor = '#ec4899';\n                ctx.shadowBlur = 15;\n                ctx.fill();\n                ctx.shadowBlur = 0;\n            }\n\n            if (isRunning) {\n                time += 0.04 * params.flowSpeed;\n            }\n            requestAnimationFrame(drawTopology);\n        }\n\n        document.getElementById('btnPerfect').addEventListener('click', () => {\n            sliders[1].value = \"2\";    \n            sliders[2].value = \"1.8\";  \n            sliders[3].value = \"35\";   \n            sliders[4].value = \"30\";   \n            sliders[5].value = \"2.0\";  \n            sliders[6].value = \"3.5\";  \n            sliders['7x'].value = \"0.0\";\n            sliders['7y'].value = \"0.0\";\n            sliders[8].value = \"8\";    \n            updateParams();\n        });\n\n        document.getElementById('btnReset').addEventListener('click', () => {\n            sliders[1].value = \"1\";\n            sliders[2].value = \"1.0\";\n            sliders[3].value = \"20\";\n            sliders[4].value = \"24\";\n            sliders[5].value = \"1.0\";\n            sliders[6].value = \"2.0\";\n            sliders['7x'].value = \"0.0\";\n            sliders['7y'].value = \"0.0\";\n            sliders[8].value = \"6\";\n            updateParams();\n        });\n\n        const btnPause = document.getElementById('btnPause');\n        btnPause.addEventListener('click', () => {\n            isRunning = !isRunning;\n            btnPause.textContent = isRunning ? \"Tạm dừng\" : \"Tiếp tục\";\n            btnPause.classList.toggle('bg-purple-600', !isRunning);\n        });\n\n        document.getElementById('btnFullScreen').addEventListener('click', () => {\n            if (!document.fullscreenElement) {\n                canvas.parentElement.requestFullscreen().catch(err => {\n                    console.log(err);\n                });\n            } else {\n                document.exitFullscreen();\n            }\n        });\n\n        updateParams();\n        requestAnimationFrame(drawTopology);\n    <\/script>\n</body>\n</html>",
+  light: "<!DOCTYPE html>\n<html lang=\"vi\" class=\"dark\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no\">\n    <title>Vũ Trụ Ánh Sáng & Tánh Không | Topo Mesh Simulation</title>\n    <!-- Tailwind CSS CDN -->\n    <script src=\"https://cdn.tailwindcss.com\"><\/script>\n    <!-- Lucide Icons -->\n    <script src=\"https://unpkg.com/lucide@latest\"><\/script>\n    <!-- Google Fonts -->\n    <link href=\"https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..700;1,400..700&family=Inter:wght@300;400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <script>\n        tailwind.config = {\n            darkMode: 'class',\n            theme: {\n                extend: {\n                    colors: {\n                        cosmic: {\n                            950: '#03030c',\n                            900: '#08081a',\n                            800: '#121232',\n                            700: '#1e1e4f',\n                            gold: '#e6c56b',\n                            cyan: '#2dd4bf',\n                            violet: '#a855f7'\n                        }\n                    },\n                    fontFamily: {\n                        sans: ['Inter', 'sans-serif'],\n                        serif: ['Playfair Display', 'serif'],\n                    }\n                }\n            }\n        }\n    <\/script>\n    <style>\n        body {\n            background-color: #03030c;\n            color: #e2e8f0;\n            font-family: 'Inter', sans-serif;\n            overflow: hidden;\n            touch-action: none;\n        }\n        .glass-panel {\n            background: rgba(8, 8, 26, 0.75);\n            backdrop-blur: blur(20px);\n            -webkit-backdrop-filter: blur(20px);\n            border: 1px solid rgba(255, 255, 255, 0.08);\n        }\n        ::-webkit-scrollbar {\n            width: 5px;\n        }\n        ::-webkit-scrollbar-track {\n            background: transparent;\n        }\n        ::-webkit-scrollbar-thumb {\n            background: rgba(255, 255, 255, 0.15);\n            border-radius: 4px;\n        }\n    </style>\n</head>\n<body class=\"h-screen w-screen flex flex-col relative selection:bg-cosmic-violet selection:text-white\">\n\n    <!-- Canvas Background Simulation -->\n    <div class=\"absolute inset-0 z-0\">\n        <canvas id=\"topoCanvas\" class=\"w-full h-full block cursor-grab active:cursor-grabbing\"></canvas>\n    </div>\n\n    <!-- Top Navigation / Header (Minimalist) -->\n    <header class=\"relative z-20 glass-panel border-b border-white/10 px-4 py-3 flex items-center justify-between\">\n        <div class=\"flex items-center space-x-3\">\n            <div class=\"w-9 h-9 rounded-full bg-gradient-to-tr from-cosmic-gold via-cosmic-violet to-cosmic-cyan flex items-center justify-center p-0.5 shadow-lg shadow-cosmic-gold/10\">\n                <div class=\"w-full h-full bg-cosmic-950 rounded-full flex items-center justify-center\">\n                    <i data-lucide=\"waves\" class=\"w-4 h-4 text-cosmic-gold animate-pulse\"></i>\n                </div>\n            </div>\n            <div>\n                <h1 class=\"font-serif text-sm md:text-base font-bold bg-gradient-to-r from-cosmic-gold via-white to-cosmic-cyan bg-clip-text text-transparent\">\n                    Vũ Trụ Ánh Sáng & Tánh Không\n                </h1>\n                <p class=\"text-[10px] md:text-xs text-slate-400\">Topological Wave Mesh • Walter Russell & Phật Giáo</p>\n            </div>\n        </div>\n\n        <div class=\"flex items-center gap-2\">\n            <!-- Toggle Control Panel Button -->\n            <button onclick=\"toggleControlPanel()\" class=\"p-2.5 rounded-xl glass-panel hover:bg-white/10 text-slate-300 hover:text-white transition-all flex items-center gap-1.5 text-xs\">\n                <i data-lucide=\"sliders\" class=\"w-4 h-4 text-cosmic-gold\"></i>\n                <span class=\"hidden md:inline\">Điều Khiển</span>\n            </button>\n        </div>\n    </header>\n\n    <!-- Floating Interactive Instructions Overlay (Disappears on touch/interaction or collapse) -->\n    <div id=\"hintOverlay\" class=\"absolute top-20 left-1/2 -translate-x-1/2 z-10 pointer-events-none transition-opacity duration-700\">\n        <div class=\"glass-panel px-4 py-2 rounded-full text-xs text-slate-300 flex items-center gap-2 shadow-2xl border border-white/10\">\n            <span class=\"w-2 h-2 rounded-full bg-cosmic-cyan animate-ping\"></span>\n            <span>Kéo chuột / Vuốt màn hình để xoay không gian 3D • Chạm để tạo sóng xung kích</span>\n        </div>\n    </div>\n\n    <!-- Collapsible Control Panel (Floating Sidebar / Bottom Drawer) -->\n    <aside id=\"controlPanel\" class=\"absolute right-4 top-20 bottom-4 w-80 max-w-[calc(100vw-2rem)] z-30 glass-panel rounded-3xl p-6 flex flex-col justify-between shadow-2xl transition-all duration-500 transform translate-y-0 opacity-100\">\n        <div class=\"space-y-6 overflow-y-auto pr-1\">\n            <div class=\"flex items-center justify-between border-b border-white/10 pb-4\">\n                <h2 class=\"font-serif text-lg font-bold text-cosmic-gold flex items-center gap-2\">\n                    <i data-lucide=\"compass\" class=\"w-5 h-5\"></i> Thông Số Tánh Không\n                </h2>\n                <button onclick=\"toggleControlPanel()\" class=\"text-slate-400 hover:text-white p-1\">\n                    <i data-lucide=\"x\" class=\"w-5 h-5\"></i>\n                </button>\n            </div>\n\n            <!-- Slider 1: Stillness (Tánh Không) -->\n            <div class=\"space-y-2\">\n                <div class=\"flex justify-between text-xs font-medium\">\n                    <span class=\"text-cosmic-gold flex items-center gap-1.5\">\n                        <i data-lucide=\"circle-dot\" class=\"w-3.5 h-3.5\"></i> Tánh Không / Sự Tĩnh Lặng\n                    </span>\n                    <span id=\"val-stillness\" class=\"text-slate-400 font-mono\">50%</span>\n                </div>\n                <input type=\"range\" id=\"range-stillness\" min=\"0\" max=\"100\" value=\"50\" \n                    class=\"w-full accent-cosmic-gold bg-cosmic-800 rounded-lg h-2 cursor-pointer\">\n                <p class=\"text-[11px] text-slate-400 leading-relaxed\">Đưa trường sóng về nguồn cội Tĩnh Lặng tuyệt đối của Ánh Sáng.</p>\n            </div>\n\n            <!-- Slider 2: Wave Frequency & Amplitude (Duyên Khởi) -->\n            <div class=\"space-y-2\">\n                <div class=\"flex justify-between text-xs font-medium\">\n                    <span class=\"text-cosmic-cyan flex items-center gap-1.5\">\n                        <i data-lucide=\"activity\" class=\"w-3.5 h-3.5\"></i> Duyên Khởi / Tần Số Sóng\n                    </span>\n                    <span id=\"val-frequency\" class=\"text-slate-400 font-mono\">50%</span>\n                </div>\n                <input type=\"range\" id=\"range-frequency\" min=\"0\" max=\"100\" value=\"50\" \n                    class=\"w-full accent-cosmic-cyan bg-cosmic-800 rounded-lg h-2 cursor-pointer\">\n                <p class=\"text-[11px] text-slate-400 leading-relaxed\">Biên độ và tần số tương tác của vạn pháp do duyên sinh.</p>\n            </div>\n\n            <!-- Slider 3: Speed & Symmetry (Trung Đạo) -->\n            <div class=\"space-y-2\">\n                <div class=\"flex justify-between text-xs font-medium\">\n                    <span class=\"text-cosmic-violet flex items-center gap-1.5\">\n                        <i data-lucide=\"rotate-3d\" class=\"w-3.5 h-3.5\"></i> Trung Đạo / Tốc Độ & Nhịp Điệu\n                    </span>\n                    <span id=\"val-speed\" class=\"text-slate-400 font-mono\">50%</span>\n                </div>\n                <input type=\"range\" id=\"range-speed\" min=\"0\" max=\"100\" value=\"50\" \n                    class=\"w-full accent-cosmic-violet bg-cosmic-800 rounded-lg h-2 cursor-pointer\">\n                <p class=\"text-[11px] text-slate-400 leading-relaxed\">Cân bằng nhịp chuyển động giữa âm-dương, buông bỏ cực đoan.</p>\n            </div>\n\n            <!-- Color Theme Selector -->\n            <div class=\"space-y-3 pt-2 border-t border-white/10\">\n                <span class=\"text-xs font-semibold text-slate-300 uppercase tracking-wider block\">Bảng Màu Ánh Sáng</span>\n                <div class=\"grid grid-cols-3 gap-2\">\n                    <button onclick=\"setTheme('gold')\" id=\"theme-gold\" class=\"py-2 px-3 rounded-xl bg-cosmic-gold/20 border border-cosmic-gold/50 text-cosmic-gold text-xs font-medium transition-all flex items-center justify-center gap-1.5\">\n                        <span class=\"w-2.5 h-2.5 rounded-full bg-cosmic-gold\"></span> Hoàng Kim\n                    </button>\n                    <button onclick=\"setTheme('cyan')\" id=\"theme-cyan\" class=\"py-2 px-3 rounded-xl bg-cosmic-cyan/10 border border-white/10 text-slate-300 text-xs font-medium transition-all flex items-center justify-center gap-1.5 hover:border-cosmic-cyan/50\">\n                        <span class=\"w-2.5 h-2.5 rounded-full bg-cosmic-cyan\"></span> Chân Không\n                    </button>\n                    <button onclick=\"setTheme('violet')\" id=\"theme-violet\" class=\"py-2 px-3 rounded-xl bg-cosmic-violet/10 border border-white/10 text-slate-300 text-xs font-medium transition-all flex items-center justify-center gap-1.5 hover:border-cosmic-violet/50\">\n                        <span class=\"w-2.5 h-2.5 rounded-full bg-cosmic-violet\"></span> Huyền Bí\n                    </button>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"pt-4 border-t border-white/10 flex items-center justify-between\">\n            <button onclick=\"resetParams()\" class=\"w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-medium text-slate-300 transition-colors border border-white/10 flex items-center justify-center gap-2\">\n                <i data-lucide=\"rotate-ccw\" class=\"w-4 h-4\"></i> Đặt Lại Mặc Định\n            </button>\n        </div>\n    </aside>\n\n    <!-- JavaScript Application Logic -->\n    <script>\n        // Initialize Lucide Icons\n        lucide.createIcons();\n\n        // Canvas & 3D Topo Mesh Setup\n        const canvas = document.getElementById('topoCanvas');\n        const ctx = canvas.getContext('2d');\n\n        let width, height;\n        function resizeCanvas() {\n            width = canvas.width = window.innerWidth * window.devicePixelRatio;\n            height = canvas.height = window.innerHeight * window.devicePixelRatio;\n            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);\n        }\n        window.addEventListener('resize', resizeCanvas);\n        resizeCanvas();\n\n        // Parameters State\n        let stillnessVal = 50;\n        let frequencyVal = 50;\n        let speedVal = 50;\n        let currentTheme = 'gold'; // gold, cyan, violet\n\n        // UI Sliders\n        const sliderStillness = document.getElementById('range-stillness');\n        const sliderFrequency = document.getElementById('range-frequency');\n        const sliderSpeed = document.getElementById('range-speed');\n\n        const valStillness = document.getElementById('val-stillness');\n        const valFrequency = document.getElementById('val-frequency');\n        const valSpeed = document.getElementById('val-speed');\n\n        sliderStillness.addEventListener('input', (e) => {\n            stillnessVal = parseInt(e.target.value);\n            valStillness.innerText = stillnessVal + '%';\n        });\n        sliderFrequency.addEventListener('input', (e) => {\n            frequencyVal = parseInt(e.target.value);\n            valFrequency.innerText = frequencyVal + '%';\n        });\n        sliderSpeed.addEventListener('input', (e) => {\n            speedVal = parseInt(e.target.value);\n            valSpeed.innerText = speedVal + '%';\n        });\n\n        function resetParams() {\n            sliderStillness.value = 50;\n            sliderFrequency.value = 50;\n            sliderSpeed.value = 50;\n            stillnessVal = 50;\n            frequencyVal = 50;\n            speedVal = 50;\n            valStillness.innerText = '50%';\n            valFrequency.innerText = '50%';\n            valSpeed.innerText = '50%';\n            angleX = 0.6;\n            angleY = 0.4;\n        }\n\n        // Theme Switcher\n        function setTheme(theme) {\n            currentTheme = theme;\n            ['gold', 'cyan', 'violet'].forEach(t => {\n                const btn = document.getElementById(`theme-${t}`);\n                if (t === theme) {\n                    btn.className = `py-2 px-3 rounded-xl border text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${\n                        t === 'gold' ? 'bg-cosmic-gold/20 border-cosmic-gold/50 text-cosmic-gold' :\n                        t === 'cyan' ? 'bg-cosmic-cyan/20 border-cosmic-cyan/50 text-cosmic-cyan' :\n                        'bg-cosmic-violet/20 border-cosmic-violet/50 text-cosmic-violet'\n                    }`;\n                } else {\n                    btn.className = 'py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-slate-300 text-xs font-medium transition-all flex items-center justify-center gap-1.5 hover:border-white/30';\n                }\n            });\n        }\n\n        // Toggle Control Panel\n        let panelOpen = true;\n        function toggleControlPanel() {\n            panelOpen = !panelOpen;\n            const panel = document.getElementById('controlPanel');\n            if (panelOpen) {\n                panel.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');\n                panel.style.transform = 'translateY(0)';\n                panel.style.opacity = '1';\n                panel.style.pointerEvents = 'auto';\n            } else {\n                panel.style.transform = 'translateY(20px)';\n                panel.style.opacity = '0';\n                panel.style.pointerEvents = 'none';\n            }\n        }\n\n        // 3D Camera / Orbit Interaction State\n        let angleX = 0.6; // Tilt angle\n        let angleY = 0.4; // Rotation angle\n        let isDragging = false;\n        let startX = 0, startY = 0;\n\n        canvas.addEventListener('mousedown', (e) => {\n            isDragging = true;\n            startX = e.clientX;\n            startY = e.clientY;\n            hideHint();\n        });\n\n        window.addEventListener('mousemove', (e) => {\n            if (!isDragging) return;\n            const deltaX = e.clientX - startX;\n            const deltaY = e.clientY - startY;\n            angleY += deltaX * 0.005;\n            angleX += deltaY * 0.005;\n            // Clamp tilt angle to avoid flipping upside down\n            angleX = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, angleX));\n            startX = e.clientX;\n            startY = e.clientY;\n        });\n\n        window.addEventListener('mouseup', () => {\n            isDragging = false;\n        });\n\n        // Touch Support for Mobile / Tablets\n        canvas.addEventListener('touchstart', (e) => {\n            if (e.touches.length === 1) {\n                isDragging = true;\n                startX = e.touches[0].clientX;\n                startY = e.touches[0].clientY;\n                hideHint();\n                // Create ripple on tap\n                triggerRipple(e.touches[0].clientX, e.touches[0].clientY);\n            }\n        }, { passive: true });\n\n        canvas.addEventListener('touchmove', (e) => {\n            if (!isDragging || e.touches.length !== 1) return;\n            const deltaX = e.touches[0].clientX - startX;\n            const deltaY = e.touches[0].clientY - startY;\n            angleY += deltaX * 0.005;\n            angleX += deltaY * 0.005;\n            angleX = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, angleX));\n            startX = e.touches[0].clientX;\n            startY = e.touches[0].clientY;\n        }, { passive: true });\n\n        canvas.addEventListener('touchend', () => {\n            isDragging = false;\n        });\n\n        canvas.addEventListener('click', (e) => {\n            triggerRipple(e.clientX, e.clientY);\n        });\n\n        function hideHint() {\n            const hint = document.getElementById('hintOverlay');\n            if (hint) hint.style.opacity = '0';\n        }\n\n        // Ripple Effect Array\n        let ripples = [];\n        function triggerRipple(clientX, clientY) {\n            const rect = canvas.getBoundingClientRect();\n            const x = clientX - rect.left;\n            const y = clientY - rect.top;\n            ripples.push({ x, y, radius: 0, maxRadius: 300, alpha: 0.8 });\n        }\n\n        // Topo Mesh Grid Configuration\n        const cols = 42;\n        const rows = 42;\n        let time = 0;\n\n        function renderTopoMesh() {\n            const displayWidth = window.innerWidth;\n            const displayHeight = window.innerHeight;\n\n            ctx.fillStyle = '#03030c';\n            ctx.fillRect(0, 0, displayWidth, displayHeight);\n\n            const speedMultiplier = (speedVal / 50) * 0.015;\n            time += speedMultiplier;\n\n            const stillnessFactor = stillnessVal / 100; // 0 to 1 (1 = flat stillness)\n            const freqMultiplier = (frequencyVal / 50) * 0.08;\n\n            const spacing = Math.min(displayWidth, displayHeight) / 32;\n            const gridWidth = cols * spacing;\n            const gridHeight = rows * spacing;\n\n            // 3D Projection parameters\n            const focalLength = 650;\n            const centerX = displayWidth / 2;\n            const centerY = displayHeight / 2 + 60;\n\n            // Compute vertex 3D heights and project to 2D\n            let points = [];\n            for (let r = 0; r < rows; r++) {\n                let rowPoints = [];\n                for (let c = 0; c < cols; c++) {\n                    const x3d = (c - cols / 2) * spacing;\n                    const z3d = (r - rows / 2) * spacing;\n\n                    // Distance from center for wave equations\n                    const distFromCenter = Math.sqrt(x3d * x3d + z3d * z3d);\n\n                    // Wave function combining Walter Russell's compression/expansion and Emptiness ripples\n                    let waveHeight = Math.sin(distFromCenter * 0.04 * freqMultiplier - time * 3) * 35;\n                    waveHeight += Math.cos(x3d * 0.05 * freqMultiplier + time * 2) * Math.sin(z3d * 0.05 * freqMultiplier + time * 2) * 25;\n\n                    // Apply ripple effects from user clicks\n                    ripples.forEach(rip => {\n                        const screenCenter = { x: displayWidth / 2, y: displayHeight / 2 };\n                        const dx = (c - cols / 2) * spacing;\n                        const dz = (r - rows / 2) * spacing;\n                        // Approximate distance to click in 3D space\n                        const distToRip = Math.abs(distFromCenter - (rip.radius * 0.8));\n                        if (distToRip < 60) {\n                            waveHeight += Math.sin(distToRip * 0.1) * 40 * (rip.alpha);\n                        }\n                    });\n\n                    // Apply Stillness (Tánh Không): dampens wave amplitude towards zero\n                    waveHeight *= (1 - stillnessFactor * 0.92);\n\n                    const y3d = -waveHeight; // Upward is negative in canvas coords\n\n                    // 3D Rotation (Yaw around Y axis, Pitch around X axis)\n                    // Rotate Y (angleY)\n                    const cosY = Math.cos(angleY);\n                    const sinY = Math.sin(angleY);\n                    const x1 = x3d * cosY - z3d * sinY;\n                    const z1 = z3d * cosY + x3d * sinY;\n\n                    // Rotate X (angleX)\n                    const cosX = Math.cos(angleX);\n                    const sinX = Math.sin(angleX);\n                    const y1 = y3d * cosX - z1 * sinX;\n                    const z2 = z1 * cosX + y3d * sinX;\n\n                    // Perspective projection\n                    const distance = 550 + z2;\n                    const scale = focalLength / Math.max(100, distance);\n                    const screenX = centerX + x1 * scale;\n                    const screenY = centerY + y1 * scale;\n\n                    rowPoints.push({\n                        sx: screenX,\n                        sy: screenY,\n                        z: z2,\n                        h: waveHeight\n                    });\n                }\n                points.push(rowPoints);\n            }\n\n            // Update ripples\n            ripples.forEach(rip => {\n                rip.radius += 4;\n                rip.alpha -= 0.015;\n            });\n            ripples = ripples.filter(rip => rip.alpha > 0);\n\n            // Draw Wireframe Grid (Lines)\n            const baseHue = currentTheme === 'gold' ? 42 : currentTheme === 'cyan' ? 175 : 270;\n\n            for (let r = 0; r < rows; r++) {\n                for (let c = 0; c < cols; c++) {\n                    const p = points[r][c];\n\n                    // Draw horizontal connection\n                    if (c < cols - 1) {\n                        const right = points[r][c + 1];\n                        drawMeshLine(p, right, baseHue);\n                    }\n                    // Draw vertical connection\n                    if (r < rows - 1) {\n                        const bottom = points[r + 1][c];\n                        drawMeshLine(p, bottom, baseHue);\n                    }\n                }\n            }\n\n            requestAnimationFrame(renderTopoMesh);\n        }\n\n        function drawMeshLine(p1, p2, baseHue) {\n            const avgHeight = (p1.h + p2.h) / 2;\n            const depthFactor = (p1.z + p2.z) / 2;\n\n            // Opacity and lightness based on depth and wave height\n            const alpha = Math.max(0.1, Math.min(0.85, 0.35 + (avgHeight / 40) - (depthFactor / 600)));\n            const lightness = Math.max(30, Math.min(75, 50 + (avgHeight * 0.8)));\n\n            ctx.beginPath();\n            ctx.moveTo(p1.sx, p1.sy);\n            ctx.lineTo(p2.sx, p2.sy);\n            ctx.strokeStyle = `hsla(${baseHue}, 85%, ${lightness}%, ${alpha})`;\n            ctx.lineWidth = 1.2;\n            ctx.stroke();\n        }\n\n        requestAnimationFrame(renderTopoMesh);\n        // Shared MP3 audio is controlled by the parent fly player.\n\n    <\/script>\n</body>\n</html>",
+  geometry: "<!DOCTYPE html>\n<html lang=\"vi\" class=\"dark\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no\">\n    <title>Vũ Trụ Hình Học Thiêng Liêng & Tánh Không</title>\n    <!-- Tailwind CSS CDN -->\n    <script src=\"https://cdn.tailwindcss.com\"><\/script>\n    <!-- Lucide Icons -->\n    <script src=\"https://unpkg.com/lucide@latest\"><\/script>\n    <!-- Three.js & OrbitControls -->\n    <script src=\"https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js\"><\/script>\n    <script src=\"https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js\"><\/script>\n    <!-- Google Fonts -->\n    <link href=\"https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap\" rel=\"stylesheet\">\n    <script>\n        tailwind.config = {\n            darkMode: 'class',\n            theme: {\n                extend: {\n                    colors: {\n                        cosmic: {\n                            950: '#020208',\n                            900: '#070716',\n                            800: '#0f0f2d',\n                            700: '#1a1a48',\n                            gold: '#ffd700',\n                            goldLight: '#fff3a8',\n                            cyan: '#00f3ff',\n                            violet: '#a855f7',\n                            magenta: '#ff007f'\n                        }\n                    },\n                    fontFamily: {\n                        sans: ['Inter', 'sans-serif'],\n                        serif: ['Cinzel', 'serif'],\n                    }\n                }\n            }\n        }\n    <\/script>\n    <style>\n        * {\n            touch-action: manipulation;\n            -webkit-tap-highlight-color: transparent;\n        }\n        body {\n            background-color: #020208;\n            color: #e2e8f0;\n            font-family: 'Inter', sans-serif;\n            overflow: hidden;\n            width: 100vw;\n            height: 100vh;\n        }\n        .font-serif {\n            font-family: 'Cinzel', serif;\n        }\n        .glass-panel {\n            background: rgba(7, 7, 22, 0.75);\n            backdrop-filter: blur(20px);\n            -webkit-backdrop-filter: blur(20px);\n            border: 1px solid rgba(255, 215, 0, 0.15);\n        }\n        .glow-gold {\n            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);\n        }\n        .glow-cyan {\n            text-shadow: 0 0 15px rgba(0, 243, 255, 0.5);\n        }\n        /* Custom styled scrollbars for panel */\n        ::-webkit-scrollbar {\n            width: 4px;\n        }\n        ::-webkit-scrollbar-track {\n            background: rgba(2, 2, 8, 0.5);\n        }\n        ::-webkit-scrollbar-thumb {\n            background: rgba(255, 215, 0, 0.3);\n            border-radius: 2px;\n        }\n        ::-webkit-scrollbar-thumb:hover {\n            background: rgba(255, 215, 0, 0.6);\n        }\n        /* Slider Styling */\n        input[type=range] {\n            -webkit-appearance: none;\n            background: rgba(255, 255, 255, 0.1);\n            border-radius: 9999px;\n            height: 6px;\n        }\n        input[type=range]::-webkit-slider-thumb {\n            -webkit-appearance: none;\n            height: 16px;\n            width: 16px;\n            border-radius: 50%;\n            background: #ffd700;\n            cursor: pointer;\n            box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);\n            border: 2px solid #020208;\n        }\n        /* Hide controls transition */\n        .panel-transition {\n            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;\n        }\n    </style>\n</head>\n<body class=\"relative w-full h-full select-none\">\n\n    <!-- 3D Canvas Container -->\n    <div id=\"webgl-container\" class=\"absolute inset-0 z-0 cursor-grab active:cursor-grabbing\"></div>\n\n    <!-- Top Overlay Header -->\n    <header class=\"absolute top-0 left-0 right-0 z-20 p-4 lg:p-6 pointer-events-none flex justify-between items-start\">\n        <div class=\"pointer-events-auto flex items-center gap-3 glass-panel p-3 lg:p-4 rounded-2xl shadow-2xl\">\n            <div class=\"w-10 h-10 rounded-xl bg-gradient-to-tr from-cosmic-gold via-cosmic-violet to-cosmic-cyan p-0.5 flex items-center justify-center animate-pulse\">\n                <div class=\"w-full h-full bg-cosmic-950 rounded-[10px] flex items-center justify-center\">\n                    <i data-lucide=\"sparkles\" class=\"w-5 h-5 text-cosmic-gold\"></i>\n                </div>\n            </div>\n            <div>\n                <h1 class=\"font-serif text-sm sm:text-base lg:text-lg font-bold bg-gradient-to-r from-cosmic-gold via-white to-cosmic-cyan bg-clip-text text-transparent tracking-wider\">\n                    SACRED GEOMETRY\n                </h1>\n                <p class=\"text-[10px] sm:text-xs text-slate-400 font-light\">Vũ Trụ Hình Học & Tánh Không</p>\n            </div>\n        </div>\n\n        <!-- Quick Action Toolbar -->\n        <div class=\"pointer-events-auto flex items-center gap-2\">\n            <button onclick=\"takeScreenshot()\" title=\"Chụp ảnh mô phỏng\" class=\"glass-panel p-3 rounded-2xl hover:bg-white/10 text-cosmic-gold transition-all duration-300 active:scale-95 shadow-lg\">\n                <i data-lucide=\"camera\" class=\"w-5 h-5\"></i>\n            </button>\n            <button onclick=\"resetCamera()\" title=\"Đặt lại góc nhìn\" class=\"glass-panel p-3 rounded-2xl hover:bg-white/10 text-cosmic-cyan transition-all duration-300 active:scale-95 shadow-lg\">\n                <i data-lucide=\"rotate-ccw\" class=\"w-5 h-5\"></i>\n            </button>\n            <button onclick=\"toggleInfoModal()\" title=\"Triết học & Hướng dẫn\" class=\"glass-panel p-3 rounded-2xl hover:bg-white/10 text-cosmic-violet transition-all duration-300 active:scale-95 shadow-lg\">\n                <i data-lucide=\"book-open\" class=\"w-5 h-5\"></i>\n            </button>\n            <button onclick=\"toggleControlPanel()\" title=\"Ẩn/Hiện bảng điều khiển\" class=\"glass-panel p-3 rounded-2xl hover:bg-white/10 text-white transition-all duration-300 active:scale-95 shadow-lg md:hidden\">\n                <i data-lucide=\"sliders\" class=\"w-5 h-5\"></i>\n            </button>\n        </div>\n    </header>\n\n    <!-- Collapsible Controls Panel (Right Side on Desktop / Bottom Slide on Mobile) -->\n    <aside id=\"control-panel\" class=\"panel-transition absolute bottom-0 left-0 right-0 md:top-24 md:bottom-auto md:right-6 md:left-auto z-20 w-full md:w-96 max-h-[75vh] md:max-h-[82vh] glass-panel rounded-t-3xl md:rounded-3xl p-5 md:p-6 overflow-y-auto shadow-2xl flex flex-col gap-5 border-t md:border border-cosmic-gold/20\">\n        \n        <div class=\"flex items-center justify-between border-b border-white/10 pb-3\">\n            <div class=\"flex items-center gap-2\">\n                <i data-lucide=\"sliders\" class=\"w-4 h-4 text-cosmic-gold\"></i>\n                <h2 class=\"font-serif text-sm font-bold tracking-wider text-cosmic-gold uppercase\">Bảng Điều Khiển Hình Học</h2>\n            </div>\n            <button onclick=\"toggleControlPanel()\" class=\"text-slate-400 hover:text-white transition-colors\">\n                <i data-lucide=\"x\" class=\"w-5 h-5\"></i>\n            </button>\n        </div>\n\n        <!-- Geometry Preset Selector -->\n        <div class=\"space-y-2\">\n            <label class=\"text-xs font-medium text-slate-300 flex items-center gap-1.5\">\n                <i data-lucide=\"shapes\" class=\"w-3.5 h-3.5 text-cosmic-cyan\"></i> Khối Hình Học Thiêng Liêng\n            </label>\n            <div class=\"grid grid-cols-2 gap-2 text-xs\">\n                <button onclick=\"setPreset('merkaba')\" id=\"preset-merkaba\" class=\"preset-btn p-2.5 rounded-xl border border-cosmic-gold/40 bg-cosmic-gold/10 text-cosmic-gold font-medium transition-all text-left flex items-center justify-between\">\n                    <span>Merkaba (Star Tetrahedron)</span>\n                    <i data-lucide=\"star\" class=\"w-3.5 h-3.5\"></i>\n                </button>\n                <button onclick=\"setPreset('flowerOfLife')\" id=\"preset-flowerOfLife\" class=\"preset-btn p-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 font-medium transition-all text-left flex items-center justify-between hover:bg-white/10\">\n                    <span>Flower of Life Grid</span>\n                    <i data-lucide=\"flower-2\" class=\"w-3.5 h-3.5\"></i>\n                </button>\n                <button onclick=\"setPreset('metatron')\" id=\"preset-metatron\" class=\"preset-btn p-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 font-medium transition-all text-left flex items-center justify-between hover:bg-white/10\">\n                    <span>Metatron's Cube</span>\n                    <i data-lucide=\"box\" class=\"w-3.5 h-3.5\"></i>\n                </button>\n                <button onclick=\"setPreset('platonic')\" id=\"preset-platonic\" class=\"preset-btn p-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 font-medium transition-all text-left flex items-center justify-between hover:bg-white/10\">\n                    <span>Platonic Solids Morph</span>\n                    <i data-lucide=\"disc\" class=\"w-3.5 h-3.5\"></i>\n                </button>\n                <button onclick=\"setPreset('vesica')\" id=\"preset-vesica\" class=\"preset-btn p-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 font-medium transition-all text-left font-sans text-xs flex items-center justify-between hover:bg-white/10 col-span-2\">\n                    <span>Vesica Piscis Light Waves</span>\n                    <i data-lucide=\"waves\" class=\"w-3.5 h-3.5\"></i>\n                </button>\n            </div>\n        </div>\n\n        <!-- Sliders -->\n        <div class=\"space-y-4 pt-1 border-t border-white/5\">\n            <!-- Slider 1: Speed / Breathing -->\n            <div class=\"space-y-1.5\">\n                <div class=\"flex justify-between text-xs font-medium\">\n                    <span class=\"text-slate-300 flex items-center gap-1.5\">\n                        <i data-lucide=\"wind\" class=\"w-3.5 h-3.5 text-cosmic-gold\"></i> Tốc Độ Nhịp Thở (Compression & Expansion)\n                    </span>\n                    <span id=\"val-speed\" class=\"text-cosmic-gold font-mono\">1.0x</span>\n                </div>\n                <input type=\"range\" id=\"slider-speed\" min=\"0.1\" max=\"3.0\" step=\"0.1\" value=\"1.0\" class=\"w-full\">\n            </div>\n\n            <!-- Slider 2: Complexity -->\n            <div class=\"space-y-1.5\">\n                <div class=\"flex justify-between text-xs font-medium\">\n                    <span class=\"text-slate-300 flex items-center gap-1.5\">\n                        <i data-lucide=\"network\" class=\"w-3.5 h-3.5 text-cosmic-cyan\"></i> Mức Độ Phức Tạp (Nodes Density)\n                    </span>\n                    <span id=\"val-complexity\" class=\"text-cosmic-cyan font-mono\">1.0</span>\n                </div>\n                <input type=\"range\" id=\"slider-complexity\" min=\"0.5\" max=\"2.5\" step=\"0.1\" value=\"1.0\" class=\"w-full\">\n            </div>\n\n            <!-- Slider 3: Color Spectrum -->\n            <div class=\"space-y-1.5\">\n                <div class=\"flex justify-between text-xs font-medium\">\n                    <span class=\"text-slate-300 flex items-center gap-1.5\">\n                        <i data-lucide=\"palette\" class=\"w-3.5 h-3.5 text-cosmic-violet\"></i> Sắc Thái Phật Tính / Ánh Sáng\n                    </span>\n                    <span id=\"val-color\" class=\"text-cosmic-violet font-mono\">Cosmic Gold</span>\n                </div>\n                <input type=\"range\" id=\"slider-color\" min=\"0\" max=\"3\" step=\"1\" value=\"0\" class=\"w-full\">\n            </div>\n        </div>\n\n        <!-- Toggles -->\n        <div class=\"space-y-2 pt-2 border-t border-white/5\">\n            <label class=\"flex items-center justify-between text-xs text-slate-300 cursor-pointer p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors\">\n                <span class=\"flex items-center gap-2\">\n                    <i data-lucide=\"move-3d\" class=\"w-4 h-4 text-cosmic-gold\"></i>\n                    <span>Trục Tĩnh Lặng Central Still Point (Void)</span>\n                </span>\n                <input type=\"checkbox\" id=\"toggle-stillness\" checked class=\"w-4 h-4 accent-cosmic-gold rounded cursor-pointer\">\n            </label>\n\n            <label class=\"flex items-center justify-between text-xs text-slate-300 cursor-pointer p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors\">\n                <span class=\"flex items-center gap-2\">\n                    <i data-lucide=\"sparkles\" class=\"w-4 h-4 text-cosmic-cyan\"></i>\n                    <span>Hạt Ánh Sáng Vũ Trụ (Mind Dust)</span>\n                </span>\n                <input type=\"checkbox\" id=\"toggle-particles\" checked class=\"w-4 h-4 accent-cosmic-cyan rounded cursor-pointer\">\n            </label>\n        </div>\n\n        <!-- Active Philosophy Insight Card -->\n        <div id=\"philosophy-card\" class=\"bg-cosmic-950/80 p-3.5 rounded-2xl border border-cosmic-gold/20 text-xs space-y-1.5\">\n            <div class=\"flex items-center gap-1.5 font-serif font-bold text-cosmic-gold\">\n                <i data-lucide=\"eye\" class=\"w-3.5 h-3.5\"></i>\n                <span id=\"card-title\">Merkaba (Star Tetrahedron)</span>\n            </div>\n            <p id=\"card-desc\" class=\"text-slate-300 leading-relaxed text-[11px]\">\n                Biểu tượng kết hợp hai khối Tứ diện đối lập đại diện cho cực tính Âm-Dương (Light/Shadow, Compression/Expansion) quay quanh Điểm Tĩnh Lặng (Central Void). Trong Phật giáo, đây là sự dung hợp Trung Đạo giữa Tánh Không và Hiện Hữu.\n            </p>\n        </div>\n    </aside>\n\n    <!-- Info & Philosophical Modal -->\n    <div id=\"info-modal\" class=\"fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300\">\n        <div class=\"glass-panel max-w-2xl w-full max-h-[85vh] rounded-3xl p-6 lg:p-8 overflow-y-auto space-y-6 border border-cosmic-gold/30 shadow-2xl relative\">\n            <button onclick=\"toggleInfoModal()\" class=\"absolute top-6 right-6 text-slate-400 hover:text-white\">\n                <i data-lucide=\"x\" class=\"w-6 h-6\"></i>\n            </button>\n\n            <div class=\"space-y-2\">\n                <span class=\"text-xs uppercase font-mono text-cosmic-gold tracking-widest\">Triết Học Hợp Nhất</span>\n                <h3 class=\"font-serif text-2xl font-bold text-white bg-gradient-to-r from-cosmic-gold via-white to-cosmic-cyan bg-clip-text text-transparent\">\n                    Sacred Geometry, Walter Russell & Đạo Phật\n                </h3>\n            </div>\n\n            <div class=\"space-y-4 text-sm text-slate-300 leading-relaxed\">\n                <div class=\"bg-cosmic-900/60 p-4 rounded-2xl border border-white/5 space-y-2\">\n                    <h4 class=\"font-serif font-bold text-cosmic-gold flex items-center gap-2\">\n                        <i data-lucide=\"sun\" class=\"w-4 h-4\"></i> The Message of the Divine Iliad (Walter Russell)\n                    </h4>\n                    <p class=\"text-xs\">\n                        Vũ trụ là một chuỗi sóng tư duy chuyển động không ngừng giữa hai cực: <strong>Compression (Nén - Dương)</strong> và <strong>Expansion (Giãn - Âm)</strong>. Ở trung tâm của mọi chuyển động là một <em>Still Point (Điểm Tĩnh Lặng)</em> - biểu tượng của Ánh Sáng Tuyệt Đối và Tâm Thức Vũ Trụ.\n                    </p>\n                </div>\n\n                <div class=\"bg-cosmic-900/60 p-4 rounded-2xl border border-white/5 space-y-2\">\n                    <h4 class=\"font-serif font-bold text-cosmic-cyan flex items-center gap-2\">\n                        <i data-lucide=\"circle-dot\" class=\"w-4 h-4\"></i> Phật Giáo (Tánh Không & Trung Đạo)\n                    </h4>\n                    <p class=\"text-xs\">\n                        Hình học thiêng liêng biểu thị mạng lưới <strong>Duyên Khởi (Dependent Origination)</strong> - mọi đỉnh và cạnh liên kết phụ thuộc lẫn nhau. Bản chất của mọi hình khối là <strong>Tánh Không (Śūnyatā)</strong>: sinh khởi từ Chân Không, vận hành qua Trung Đạo và trở về Tĩnh Lặng.\n                    </p>\n                </div>\n\n                <div class=\"space-y-2 pt-2\">\n                    <h4 class=\"font-serif font-bold text-white text-xs uppercase tracking-wider\">Ý Nghĩa Các Khối Hình Học:</h4>\n                    <ul class=\"grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs\">\n                        <li class=\"bg-white/5 p-2.5 rounded-xl border border-white/5\"><strong>Merkaba:</strong> Cực tính Âm-Dương xoay quanh Tâm Tĩnh Lặng.</li>\n                        <li class=\"bg-white/5 p-2.5 rounded-xl border border-white/5\"><strong>Flower of Life:</strong> Mạng lưới Duyên Khởi kết nối vạn vật.</li>\n                        <li class=\"bg-white/5 p-2.5 rounded-xl border border-white/5\"><strong>Metatron's Cube:</strong> Khung mẫu tạo hóa của 5 khối Platonic.</li>\n                        <li class=\"bg-white/5 p-2.5 rounded-xl border border-white/5\"><strong>Vesica Piscis:</strong> Nhị diện giao thoa tạo ra Ánh Sáng.</li>\n                    </ul>\n                </div>\n            </div>\n\n            <button onclick=\"toggleInfoModal()\" class=\"w-full py-3 rounded-2xl bg-gradient-to-r from-cosmic-gold to-cosmic-cyan text-cosmic-950 font-bold text-sm hover:opacity-95 transition-all\">\n                Đã Hiểu & Tiếp Tục Trải Nghiệm\n            </button>\n        </div>\n    </div>\n\n    <!-- Bottom Center Interaction Cue -->\n    <div class=\"absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none text-center hidden md:block\">\n        <p class=\"text-[11px] text-slate-400/80 bg-cosmic-950/60 px-4 py-1.5 rounded-full border border-white/10 backdrop-blur-md\">\n            ✨ Xoay bằng chuột / Vuốt màn hình • Cuộn để phóng to/thu nhỏ\n        </p>\n    </div>\n\n    <!-- JavaScript Application Core Logic -->\n    <script>\n        // Initialize Lucide Icons\n        lucide.createIcons();\n\n        // Preset Information Data\n        const PRESETS = {\n            merkaba: {\n                title: \"Merkaba (Star Tetrahedron)\",\n                desc: \"Biểu tượng kết hợp hai khối Tứ diện đối lập đại diện cho cực tính Âm-Dương (Light/Shadow, Compression/Expansion) quay quanh Điểm Tĩnh Lặng (Central Void). Trong Phật giáo, đây là sự dung hợp Trung Đạo giữa Tánh Không và Hiện Hữu.\"\n            },\n            flowerOfLife: {\n                title: \"Flower of Life Grid\",\n                desc: \"Mạng lưới hình học thiêng liêng cấu thành từ các hình tròn đan xen, minh họa hoàn hảo cho triết lý Duyên Khởi (Interconnectedness). Mỗi nút giao là một thực thể sinh khởi trong mối quan hệ hữu cơ với toàn thể vũ trụ.\"\n            },\n            metatron: {\n                title: \"Metatron's Cube\",\n                desc: \"Chứa đựng toàn bộ 5 khối Platonic, Metatron's Cube đại diện cho bản thiết kế tạo hóa của Sóng Tư Duy (Walter Russell). Mọi dạng vật chất đều biến thiên từ khung cấu trúc hình học thiêng liêng này.\"\n            },\n            platonic: {\n                title: \"Platonic Solids Morphing\",\n                desc: \"Sự chuyển hóa nhịp nhàng giữa 5 khối đa diện đều (Tứ diện, Lập phương, Bát diện, Thập nhị diện, Nhị thập diện) tượng trưng cho sự luân chuyển của 5 đại (Địa, Thủy, Hỏa, Phong, Không) trong triết học Phật giáo.\"\n            },\n            vesica: {\n                title: \"Vesica Piscis Light Waves\",\n                desc: \"Giao điểm của hai hình cầu Ánh Sáng ban sơ, biểu thị cho sát-na khởi tạo vật chất và nhận thức. Nhịp sóng lan tỏa đại diện cho sự phóng chiếu từ Tâm Tĩnh Lặng ra thế giới hiện tượng.\"\n            }\n        };\n\n        // UI Logic Toggles\n        let panelOpen = true;\n        function toggleControlPanel() {\n            const panel = document.getElementById('control-panel');\n            panelOpen = !panelOpen;\n            if (panelOpen) {\n                panel.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none', 'md:translate-x-full');\n            } else {\n                panel.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none', 'md:translate-x-full');\n            }\n        }\n\n        function toggleInfoModal() {\n            const modal = document.getElementById('info-modal');\n            if (modal.classList.contains('hidden')) {\n                modal.classList.remove('hidden');\n                setTimeout(() => {\n                    modal.classList.remove('opacity-0');\n                }, 10);\n            } else {\n                modal.classList.add('opacity-0');\n                setTimeout(() => {\n                    modal.classList.add('hidden');\n                }, 300);\n            }\n        }\n\n        // --- THREE.JS SCENE SETUP ---\n        const container = document.getElementById('webgl-container');\n        let scene, camera, renderer, controls;\n        let mainGroup, particleSystem, stillnessPointMesh;\n\n        // Simulation parameters\n        let currentPreset = 'merkaba';\n        let speedMult = 1.0;\n        let complexityMult = 1.0;\n        let colorSchemeIndex = 0; // 0: Gold, 1: Cyan, 2: Violet, 3: Rainbow Spectrum\n        let showStillness = true;\n        let showParticles = true;\n\n        // Color Palettes\n        const COLOR_PALETTES = [\n            { primary: 0xffd700, secondary: 0xffa500, glow: 0xfff3a8, name: \"Cosmic Gold\" },\n            { primary: 0x00f3ff, secondary: 0x0077ff, glow: 0x80f9ff, name: \"Cyan Void\" },\n            { primary: 0xa855f7, secondary: 0xff007f, glow: 0xe9d5ff, name: \"Violet Buddha\" },\n            { primary: 0xffd700, secondary: 0x00f3ff, glow: 0xa855f7, name: \"Rainbow Aura\" }\n        ];\n\n        function initThree() {\n            // Scene\n            scene = new THREE.Scene();\n            scene.fog = new THREE.FogExp2(0x020208, 0.012);\n\n            // Camera\n            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);\n            camera.position.set(0, 0, 35);\n\n            // Renderer\n            renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: true });\n            renderer.setSize(window.innerWidth, window.innerHeight);\n            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));\n            renderer.toneMapping = THREE.ACESFilmicToneMapping;\n            container.appendChild(renderer.domElement);\n\n            // Orbit Controls\n            controls = new THREE.OrbitControls(camera, renderer.domElement);\n            controls.enableDamping = true;\n            controls.dampingFactor = 0.05;\n            controls.rotateSpeed = 0.8;\n            controls.maxDistance = 100;\n            controls.minDistance = 5;\n\n            // Lights\n            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);\n            scene.add(ambientLight);\n\n            const pointLight1 = new THREE.PointLight(0xffd700, 2, 50);\n            pointLight1.position.set(10, 15, 10);\n            scene.add(pointLight1);\n\n            const pointLight2 = new THREE.PointLight(0x00f3ff, 2, 50);\n            pointLight2.position.set(-10, -15, -10);\n            scene.add(pointLight2);\n\n            // Main Geometry Group\n            mainGroup = new THREE.Group();\n            scene.add(mainGroup);\n\n            // Build Initial Objects\n            createStillnessPoint();\n            createParticles();\n            buildGeometry(currentPreset);\n\n            // Event Listeners\n            window.addEventListener('resize', onWindowResize);\n            setupUIEventListeners();\n\n            // Start Animation Loop\n            animate();\n        }\n\n        // --- STILLNESS POINT (CENTRAL VOID / CHÂN KHÔNG) ---\n        function createStillnessPoint() {\n            if (stillnessPointMesh) scene.remove(stillnessPointMesh);\n\n            const group = new THREE.Group();\n\n            // Core glowing sphere\n            const geo = new THREE.SphereGeometry(0.8, 32, 32);\n            const mat = new THREE.MeshBasicMaterial({\n                color: 0xffffff,\n                wireframe: false\n            });\n            const core = new THREE.Mesh(geo, mat);\n            group.add(core);\n\n            // Axis vectors representing central stillness\n            const axisGeo = new THREE.BufferGeometry();\n            const axisCoords = [\n                -3,0,0, 3,0,0,\n                0,-3,0, 0,3,0,\n                0,0,-3, 0,0,3\n            ];\n            axisGeo.setAttribute('position', new THREE.Float32BufferAttribute(axisCoords, 3));\n            const axisMat = new THREE.LineBasicMaterial({ color: 0xffd700, transparent: true, opacity: 0.5 });\n            const axes = new THREE.LineSegments(axisGeo, axisMat);\n            group.add(axes);\n\n            stillnessPointMesh = group;\n            stillnessPointMesh.visible = showStillness;\n            scene.add(stillnessPointMesh);\n        }\n\n        // --- MIND DUST / COSMIC PARTICLES ---\n        function createParticles() {\n            if (particleSystem) scene.remove(particleSystem);\n\n            const count = 1200;\n            const geometry = new THREE.BufferGeometry();\n            const positions = new Float32Array(count * 3);\n            const colors = new Float32Array(count * 3);\n\n            const palette = COLOR_PALETTES[colorSchemeIndex];\n            const c1 = new THREE.Color(palette.primary);\n            const c2 = new THREE.Color(palette.secondary);\n\n            for (let i = 0; i < count; i++) {\n                const r = (Math.random() * 40) + 5;\n                const theta = Math.random() * Math.PI * 2;\n                const phi = Math.acos((Math.random() * 2) - 1);\n\n                positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);\n                positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);\n                positions[i * 3 + 2] = r * Math.cos(phi);\n\n                const mixedColor = c1.clone().lerp(c2, Math.random());\n                colors[i * 3] = mixedColor.r;\n                colors[i * 3 + 1] = mixedColor.g;\n                colors[i * 3 + 2] = mixedColor.b;\n            }\n\n            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));\n            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));\n\n            const material = new THREE.PointsMaterial({\n                size: 0.25,\n                vertexColors: true,\n                transparent: true,\n                opacity: 0.6,\n                blending: THREE.AdditiveBlending\n            });\n\n            particleSystem = new THREE.Points(geometry, material);\n            particleSystem.visible = showParticles;\n            scene.add(particleSystem);\n        }\n\n        // --- GEOMETRY BUILDERS ---\n        function clearMainGroup() {\n            while (mainGroup.children.length > 0) {\n                const obj = mainGroup.children[0];\n                if (obj.geometry) obj.geometry.dispose();\n                if (obj.material) {\n                    if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());\n                    else obj.material.dispose();\n                }\n                mainGroup.remove(obj);\n            }\n        }\n\n        function buildGeometry(preset) {\n            clearMainGroup();\n            const palette = COLOR_PALETTES[colorSchemeIndex];\n\n            switch (preset) {\n                case 'merkaba':\n                    buildMerkaba(palette);\n                    break;\n                case 'flowerOfLife':\n                    buildFlowerOfLife(palette);\n                    break;\n                case 'metatron':\n                    buildMetatronCube(palette);\n                    break;\n                case 'platonic':\n                    buildPlatonicMorph(palette);\n                    break;\n                case 'vesica':\n                    buildVesicaPiscis(palette);\n                    break;\n            }\n        }\n\n        // 1. MERKABA BUILDER\n        function buildMerkaba(palette) {\n            const size = 6 * complexityMult;\n\n            // Male Tetrahedron (Pointing Up)\n            const geoUp = new THREE.TetrahedronGeometry(size);\n            const matUp = new THREE.MeshStandardMaterial({\n                color: palette.primary,\n                wireframe: true,\n                emissive: palette.primary,\n                emissiveIntensity: 0.3,\n                roughness: 0.2\n            });\n            const meshUp = new THREE.Mesh(geoUp, matUp);\n\n            // Female Tetrahedron (Pointing Down)\n            const geoDown = new THREE.TetrahedronGeometry(size);\n            geoDown.rotateX(Math.PI);\n            const matDown = new THREE.MeshStandardMaterial({\n                color: palette.secondary,\n                wireframe: true,\n                emissive: palette.secondary,\n                emissiveIntensity: 0.3,\n                roughness: 0.2\n            });\n            const meshDown = new THREE.Mesh(geoDown, matDown);\n\n            const group = new THREE.Group();\n            group.add(meshUp);\n            group.add(meshDown);\n\n            // Inner Solid Glass Core\n            const coreGeo = new THREE.OctahedronGeometry(size * 0.4);\n            const coreMat = new THREE.MeshPhysicalMaterial({\n                color: 0xffffff,\n                transmission: 0.9,\n                opacity: 1,\n                transparent: true,\n                roughness: 0,\n                ior: 1.5\n            });\n            group.add(new THREE.Mesh(coreGeo, coreMat));\n\n            mainGroup.add(group);\n        }\n\n        // 2. FLOWER OF LIFE BUILDER\n        function buildFlowerOfLife(palette) {\n            const group = new THREE.Group();\n            const radius = 2.5;\n            const layers = Math.floor(2 * complexityMult);\n\n            const mat = new THREE.LineBasicMaterial({\n                color: palette.primary,\n                transparent: true,\n                opacity: 0.7\n            });\n\n            // Central circle\n            const createCircle = (x, y, z) => {\n                const curve = new THREE.EllipseCurve(0, 0, radius, radius, 0, 2 * Math.PI, false, 0);\n                const points = curve.getPoints(48);\n                const geo = new THREE.BufferGeometry().setFromPoints(points);\n                const line = new THREE.Line(geo, mat);\n                line.position.set(x, y, z);\n                return line;\n            };\n\n            group.add(createCircle(0, 0, 0));\n\n            // Hexagonal Ring Generation\n            for (let l = 1; l <= layers + 1; l++) {\n                for (let i = 0; i < 6; i++) {\n                    const angle = (i * Math.PI) / 3;\n                    const x = Math.cos(angle) * radius * l;\n                    const y = Math.sin(angle) * radius * l;\n                    group.add(createCircle(x, y, 0));\n                    group.add(createCircle(x, y, radius * 0.5));\n                    group.add(createCircle(x, y, -radius * 0.5));\n                }\n            }\n\n            mainGroup.add(group);\n        }\n\n        // 3. METATRON'S CUBE BUILDER\n        function buildMetatronCube(palette) {\n            const group = new THREE.Group();\n            const radius = 5 * complexityMult;\n            const nodePositions = [];\n\n            // Center\n            nodePositions.push(new THREE.Vector3(0, 0, 0));\n\n            // Inner 6 nodes\n            for (let i = 0; i < 6; i++) {\n                const angle = (i * Math.PI) / 3;\n                nodePositions.push(new THREE.Vector3(Math.cos(angle) * radius * 0.5, Math.sin(angle) * radius * 0.5, 0));\n            }\n            // Outer 6 nodes\n            for (let i = 0; i < 6; i++) {\n                const angle = (i * Math.PI) / 3;\n                nodePositions.push(new THREE.Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius, 0));\n            }\n\n            // Node Spheres\n            const nodeGeo = new THREE.SphereGeometry(0.3, 16, 16);\n            const nodeMat = new THREE.MeshStandardMaterial({ color: palette.glow, emissive: palette.primary });\n\n            nodePositions.forEach(pos => {\n                const mesh = new THREE.Mesh(nodeGeo, nodeMat);\n                mesh.position.copy(pos);\n                group.add(mesh);\n            });\n\n            // Connect every node to every other node (Interconnectedness / Duyên Khởi)\n            const linePositions = [];\n            for (let i = 0; i < nodePositions.length; i++) {\n                for (let j = i + 1; j < nodePositions.length; j++) {\n                    linePositions.push(nodePositions[i].x, nodePositions[i].y, nodePositions[i].z);\n                    linePositions.push(nodePositions[j].x, nodePositions[j].y, nodePositions[j].z);\n                }\n            }\n\n            const lineGeo = new THREE.BufferGeometry();\n            lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));\n            const lineMat = new THREE.LineBasicMaterial({ color: palette.primary, transparent: true, opacity: 0.4 });\n            const lines = new THREE.LineSegments(lineGeo, lineMat);\n\n            group.add(lines);\n            mainGroup.add(group);\n        }\n\n        // 4. PLATONIC SOLIDS MORPH BUILDER\n        function buildPlatonicMorph(palette) {\n            const group = new THREE.Group();\n            const size = 5 * complexityMult;\n\n            const geometries = [\n                new THREE.TetrahedronGeometry(size),\n                new THREE.BoxGeometry(size, size, size),\n                new THREE.OctahedronGeometry(size),\n                new THREE.DodecahedronGeometry(size),\n                new THREE.IcosahedronGeometry(size)\n            ];\n\n            geometries.forEach((geo, idx) => {\n                const mat = new THREE.MeshStandardMaterial({\n                    color: idx % 2 === 0 ? palette.primary : palette.secondary,\n                    wireframe: true,\n                    transparent: true,\n                    opacity: 0.5\n                });\n                const mesh = new THREE.Mesh(geo, mat);\n                mesh.scale.setScalar(0.4 + idx * 0.25);\n                group.add(mesh);\n            });\n\n            mainGroup.add(group);\n        }\n\n        // 5. VESICA PISCIS BUILDER\n        function buildVesicaPiscis(palette) {\n            const group = new THREE.Group();\n            const radius = 6 * complexityMult;\n\n            const mat1 = new THREE.MeshStandardMaterial({\n                color: palette.primary,\n                wireframe: true,\n                transparent: true,\n                opacity: 0.5\n            });\n            const mat2 = new THREE.MeshStandardMaterial({\n                color: palette.secondary,\n                wireframe: true,\n                transparent: true,\n                opacity: 0.5\n            });\n\n            const sphere1 = new THREE.Mesh(new THREE.SphereGeometry(radius, 24, 24), mat1);\n            sphere1.position.x = -radius * 0.5;\n\n            const sphere2 = new THREE.Mesh(new THREE.SphereGeometry(radius, 24, 24), mat2);\n            sphere2.position.x = radius * 0.5;\n\n            group.add(sphere1);\n            group.add(sphere2);\n\n            mainGroup.add(group);\n        }\n\n\n        // --- ANIMATION & TIME LOOP ---\n        let clock = new THREE.Clock();\n\n        function animate() {\n            requestAnimationFrame(animate);\n\n            const delta = clock.getDelta();\n            const elapsedTime = clock.getElapsedTime() * speedMult;\n\n            // 1. Rotate Main Geometry Group (Balanced Interchange)\n            if (mainGroup) {\n                mainGroup.rotation.y = elapsedTime * 0.2;\n                mainGroup.rotation.x = Math.sin(elapsedTime * 0.1) * 0.15;\n\n                // Pulsing Breathing Effect (Compression & Expansion)\n                if (currentPreset === 'merkaba') {\n                    const child1 = mainGroup.children[0]?.children[0];\n                    const child2 = mainGroup.children[0]?.children[1];\n                    if (child1 && child2) {\n                        child1.rotation.y = elapsedTime * 0.5;\n                        child2.rotation.y = -elapsedTime * 0.5;\n                    }\n                }\n\n                // Breathing Scale\n                const breathScale = 1 + Math.sin(elapsedTime * 1.5) * 0.08;\n                mainGroup.scale.set(breathScale, breathScale, breathScale);\n            }\n\n            // 2. Animate Particles\n            if (particleSystem && particleSystem.visible) {\n                particleSystem.rotation.y = -elapsedTime * 0.05;\n            }\n\n            // 3. Pulse Stillness Core\n            if (stillnessPointMesh && stillnessPointMesh.visible) {\n                const core = stillnessPointMesh.children[0];\n                if (core) {\n                    const pulse = 0.8 + Math.sin(elapsedTime * 3) * 0.15;\n                    core.scale.set(pulse, pulse, pulse);\n                }\n            }\n\n            controls.update();\n            renderer.render(scene, camera);\n        }\n\n\n        // --- UI & EVENT LISTENERS ---\n        function setupUIEventListeners() {\n            // Slider 1: Speed\n            document.getElementById('slider-speed').addEventListener('input', (e) => {\n                speedMult = parseFloat(e.target.value);\n                document.getElementById('val-speed').innerText = speedMult.toFixed(1) + 'x';\n            });\n\n            // Slider 2: Complexity\n            document.getElementById('slider-complexity').addEventListener('input', (e) => {\n                complexityMult = parseFloat(e.target.value);\n                document.getElementById('val-complexity').innerText = complexityMult.toFixed(1);\n                buildGeometry(currentPreset);\n            });\n\n            // Slider 3: Color Spectrum\n            document.getElementById('slider-color').addEventListener('input', (e) => {\n                colorSchemeIndex = parseInt(e.target.value);\n                const palette = COLOR_PALETTES[colorSchemeIndex];\n                document.getElementById('val-color').innerText = palette.name;\n                buildGeometry(currentPreset);\n                createParticles();\n            });\n\n            // Toggle Stillness\n            document.getElementById('toggle-stillness').addEventListener('change', (e) => {\n                showStillness = e.target.checked;\n                if (stillnessPointMesh) stillnessPointMesh.visible = showStillness;\n            });\n\n            // Toggle Particles\n            document.getElementById('toggle-particles').addEventListener('change', (e) => {\n                showParticles = e.target.checked;\n                if (particleSystem) particleSystem.visible = showParticles;\n            });\n        }\n\n        function setPreset(preset) {\n            currentPreset = preset;\n            document.querySelectorAll('.preset-btn').forEach(btn => {\n                btn.classList.remove('border-cosmic-gold/40', 'bg-cosmic-gold/10', 'text-cosmic-gold');\n                btn.classList.add('border-white/10', 'bg-white/5', 'text-slate-300');\n            });\n\n            const activeBtn = document.getElementById(`preset-${preset}`);\n            if (activeBtn) {\n                activeBtn.classList.remove('border-white/10', 'bg-white/5', 'text-slate-300');\n                activeBtn.classList.add('border-cosmic-gold/40', 'bg-cosmic-gold/10', 'text-cosmic-gold');\n            }\n\n            // Update Philosophy Insight Card\n            const info = PRESETS[preset];\n            if (info) {\n                document.getElementById('card-title').innerText = info.title;\n                document.getElementById('card-desc').innerText = info.desc;\n            }\n\n            buildGeometry(preset);\n        }\n\n        function resetCamera() {\n            camera.position.set(0, 0, 35);\n            controls.target.set(0, 0, 0);\n            controls.update();\n        }\n\n        function onWindowResize() {\n            camera.aspect = window.innerWidth / window.innerHeight;\n            camera.updateProjectionMatrix();\n            renderer.setSize(window.innerWidth, window.innerHeight);\n        }\n\n        // --- SCREENSHOT FUNCTIONALITY ---\n        function takeScreenshot() {\n            renderer.render(scene, camera);\n            const dataURL = renderer.domElement.toDataURL('image/png');\n            const link = document.createElement('a');\n            link.download = `sacred-geometry-${currentPreset}.png`;\n            link.href = dataURL;\n            link.click();\n        }\n        // Shared MP3 audio is controlled by the parent fly player.\n\n\n\n        // Initialize App on DOM Load\n        window.onload = () => {\n            initThree();\n        };\n    <\/script>\n</body>\n</html>"
+};
+(() => {
+  const frame = document.getElementById('simulation-frame');
+  const tabs = Array.from(document.querySelectorAll('.tab[data-view]'));
+  let activeView = '';
+  const titles = {
+    topology: ['Mô phỏng Topo & Bát Chánh Đạo', 'Topo & Bát Chánh Đạo | Vũ Trụ Hợp Nhất'],
+    light: ['Mô phỏng Ánh Sáng và Tánh Không', 'Ánh Sáng & Tánh Không | Vũ Trụ Hợp Nhất'],
+    geometry: ['Mô phỏng Hình Học Thiêng Liêng', 'Hình Học Thiêng Liêng | Vũ Trụ Hợp Nhất']
+  };
+  function showSimulation(view) {
+    if (!Object.prototype.hasOwnProperty.call(apps, view)) return;
+    tabs.forEach(tab => {
+      const selected = tab.dataset.view === view;
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+    });
+    if (activeView !== view) {
+      frame.title = titles[view][0];
+      frame.srcdoc = apps[view];
+      activeView = view;
+      document.title = titles[view][1];
+    }
+  }
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => showSimulation(tab.dataset.view));
+    tab.addEventListener('keydown', event => {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      event.preventDefault();
+      const currentIndex = tabs.indexOf(tab);
+      const nextIndex = (currentIndex + (event.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
+      tabs[nextIndex].focus();
+      showSimulation(tabs[nextIndex].dataset.view);
+    });
+  });
+  showSimulation('topology');
+})();
 
-        <button id="btnToggleMusic" class="ml-2 px-2.5 py-1.5 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-medium transition-all">
-            Phát
-        </button>
+// Shared MP3 fly player. Attempt autoplay on load, and retry on first user interaction if blocked.
+(() => {
+  const audio = document.getElementById('bgAudio');
+  const player = document.getElementById('flyMusicPlayer');
+  const button = document.getElementById('btnToggleMusic');
+  const disc = document.getElementById('musicIconWrapper');
+  const status = document.getElementById('musicStatusText');
+  const icon = document.getElementById('playPauseIcon');
+  let userPaused = false;
+  let playPromise = null;
+  audio.volume = 0.32;
 
-        <!-- THẺ AUDIO: Thay link mp3 của bạn vào thuộc tính src dưới đây -->
-        <audio id="bgAudio" loop preload="auto">
-            <source src="./mp3/universal-path.mp3" type="audio/mpeg">
-            Trình duyệt của bạn không hỗ trợ thẻ audio.
-        </audio>
-    </div>
+  function render(isPlaying, message) {
+    button.textContent = isPlaying ? 'Dừng' : 'Phát';
+    button.setAttribute('aria-pressed', String(isPlaying));
+    disc.setAttribute('aria-label', isPlaying ? 'Tạm dừng nhạc nền' : 'Phát nhạc nền');
+    disc.classList.toggle('animate-spin-slow', isPlaying);
+    status.textContent = message || (isPlaying ? 'Đang phát nhạc nền' : 'Đã tạm dừng');
+    icon.innerHTML = isPlaying
+      ? '<path d="M8 6h3v12H8zM14 6h3v12h-3z" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="10" stroke="currentColor"/>'
+      : '<path d="M9 6v12l10-6z" fill="currentColor" stroke="none"/>';
+  }
+  function startMusic() {
+    if (!audio.paused) { render(true); return Promise.resolve(true); }
+    if (playPromise) return playPromise;
+    playPromise = audio.play().then(() => {
+      userPaused = false;
+      render(true, 'Đang phát nhạc nền');
+      return true;
+    }).catch(() => {
+      render(false, 'Trình duyệt chặn tự phát — nhấn Phát để bật nhạc');
+      return false;
+    }).finally(() => { playPromise = null; });
+    return playPromise;
+  }
+  function toggleMusic() {
+    if (audio.paused) {
+      userPaused = false;
+      startMusic();
+    } else {
+      userPaused = true;
+      audio.pause();
+      render(false, 'Đã tạm dừng nhạc');
+    }
+  }
+  button.addEventListener('click', toggleMusic);
+  disc.addEventListener('click', toggleMusic);
+  disc.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleMusic(); }
+  });
+  audio.addEventListener('playing', () => render(true, 'Đang phát nhạc nền'));
+  audio.addEventListener('pause', () => { if (userPaused) render(false, 'Đã tạm dừng nhạc'); });
+  audio.addEventListener('error', () => render(false, 'Không tải được MP3 — kiểm tra ./mp3/universal-path.mp3'));
 
-    <!-- Header -->
-    <header class="border-b border-slate-800 bg-topo-card/75 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-cyan-500 to-amber-400 flex items-center justify-center shadow-lg shadow-purple-500/20">
-                    <svg class="w-6 h-6 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg bg-gradient-to-r from-purple-400 via-cyan-300 to-amber-300 bg-clip-text text-transparent">Quantum Topology & Noble Path</h1>
-                    <p class="text-xs text-slate-400">Mô phỏng Biến dạng Không-thời gian, Độ uốn cong Topo & Bát Chánh Đạo</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-2">
-                <button id="btnPerfect" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-purple-500/20 transition-all transform active:scale-95 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    Không Gian Topo Viên Mãn
-                </button>
-                <button id="btnReset" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-sm rounded-xl transition-all">
-                    Đặt lại
-                </button>
-            </div>
-        </div>
-    </header>
+  // Tự phát khi người dùng click/chạm ở bất kỳ đâu trong trang hoặc bên trong mô phỏng.
+  // Bỏ qua click của fly player để nút Dừng không bị bật nhạc lại ngay lập tức.
+  function startFromGesture(event) {
+    if (event && event.target && player.contains(event.target)) return;
+    if (audio.paused) {
+      userPaused = false;
+      startMusic();
+    }
+  }
+  document.addEventListener('click', startFromGesture);
+  document.addEventListener('keydown', startFromGesture);
 
-    <!-- Main Content Grid -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
-        <!-- Left Column: Controls -->
-        <section class="lg:col-span-7 flex flex-col gap-4">
-            <div class="bg-topo-card/80 border border-slate-800/80 rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur">
-                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-                    <h2 class="font-semibold text-base flex items-center gap-2 text-purple-400">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
-                        Bảng Điều Khiển Thông Số Topo Học
-                    </h2>
-                    <span id="topoStatus" class="text-xs px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-medium">Trạng thái: Lưới Đa Chiều Ổn Định</span>
-                </div>
-
-                <div class="space-y-4 max-h-[600px] overflow-y-auto pr-1">
-                    
-                    <!-- 1. Chánh Kiến -->
-                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-purple-500/40 transition-colors">
-                        <div class="flex justify-between items-center mb-1.5">
-                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-purple-400"></span>
-                                1. Chánh Kiến - Hệ số Genus (Right View)
-                            </span>
-                            <span id="val1" class="text-xs font-mono text-purple-400 bg-purple-950/50 px-2 py-0.5 rounded border border-purple-800/50">Genus 1 (Torus)</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-2">Định hình cấu trúc hình học nền tảng của không gian (Số lỗ xuyên qua mặt phẳng topo).</p>
-                        <input type="range" id="slider1" min="0" max="4" step="1" value="1" class="w-full accent-purple-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
-                    </div>
-
-                    <!-- 2. Chánh Tư Duy -->
-                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-cyan-500/40 transition-colors">
-                        <div class="flex justify-between items-center mb-1.5">
-                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-                                2. Chánh Tư Duy - Độ Uốn Gauss (Right Intention)
-                            </span>
-                            <span id="val2" class="text-xs font-mono text-cyan-400 bg-cyan-950/50 px-2 py-0.5 rounded border border-cyan-800/50">1.0 K</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-2">Độ cong không-thời gian hướng ý niệm nội tại (Dương: Hình cầu, Âm: Yên ngựa).</p>
-                        <input type="range" id="slider2" min="-2" max="2" step="0.2" value="1.0" class="w-full accent-cyan-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
-                    </div>
-
-                    <!-- 3. Chánh Ngữ -->
-                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-teal-500/40 transition-colors">
-                        <div class="flex justify-between items-center mb-1.5">
-                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-teal-400"></span>
-                                3. Chánh Ngữ - Biên độ Sóng Lưới (Right Speech)
-                            </span>
-                            <span id="val3" class="text-xs font-mono text-teal-400 bg-teal-950/50 px-2 py-0.5 rounded border border-teal-800/50">20 px</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-2">Sự truyền tải năng lượng ngôn từ qua các chiều sóng không gian.</p>
-                        <input type="range" id="slider3" min="5" max="50" step="1" value="20" class="w-full accent-teal-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
-                    </div>
-
-                    <!-- 4. Chánh Nghiệp -->
-                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-blue-500/40 transition-colors">
-                        <div class="flex justify-between items-center mb-1.5">
-                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-blue-400"></span>
-                                4. Chánh Nghiệp - Mật độ Lưới (Right Action)
-                            </span>
-                            <span id="val4" class="text-xs font-mono text-blue-400 bg-blue-950/50 px-2 py-0.5 rounded border border-blue-800/50">24 node</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-2">Trật tự nhân quả & độ tinh vi trong cấu trúc mạng lưới thực tại.</p>
-                        <input type="range" id="slider4" min="12" max="40" step="2" value="24" class="w-full accent-blue-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
-                    </div>
-
-                    <!-- 5. Chánh Mạng -->
-                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-amber-500/40 transition-colors">
-                        <div class="flex justify-between items-center mb-1.5">
-                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                                5. Chánh Mạng - Tốc độ Hầm Lượng Tử (Right Livelihood)
-                            </span>
-                            <span id="val5" class="text-xs font-mono text-amber-400 bg-amber-950/50 px-2 py-0.5 rounded border border-amber-800/50">1.0x</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-2">Sự nuôi dưỡng dòng chảy năng lượng sinh học cân bằng và bền vững.</p>
-                        <input type="range" id="slider5" min="0.2" max="3.0" step="0.2" value="1.0" class="w-full accent-amber-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
-                    </div>
-
-                    <!-- 6. Chánh Tinh Tấn -->
-                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-rose-500/40 transition-colors">
-                        <div class="flex justify-between items-center mb-1.5">
-                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-rose-400"></span>
-                                6. Chánh Tinh Tấn - Tần số Xoắn (Right Effort)
-                            </span>
-                            <span id="val6" class="text-xs font-mono text-rose-400 bg-rose-950/50 px-2 py-0.5 rounded border border-rose-800/50">2.0 Hz</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-2">Độ bền bỉ, nghị lực tinh tấn làm biến đổi và làm sạch trường không gian.</p>
-                        <input type="range" id="slider6" min="0.5" max="5.0" step="0.5" value="2.0" class="w-full accent-rose-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
-                    </div>
-
-                    <!-- 7. Chánh Niệm -->
-                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-emerald-500/40 transition-colors">
-                        <div class="flex justify-between items-center mb-1.5">
-                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                                7. Chánh Niệm - Tâm Kỳ Dị (Right Mindfulness)
-                            </span>
-                            <span id="val7" class="text-xs font-mono text-emerald-400 bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-800/50">Center (0, 0)</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-2">Điểm neo giữ sự tỉnh thức tại trung tâm trường topo lượng tử.</p>
-                        <div class="grid grid-cols-2 gap-2 mt-2">
-                            <div>
-                                <label class="text-[10px] text-slate-400 block mb-1">Trục X tâm</label>
-                                <input type="range" id="slider7x" min="-1" max="1" step="0.1" value="0" class="w-full accent-emerald-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-400 block mb-1">Trục Y tâm</label>
-                                <input type="range" id="slider7y" min="-1" max="1" step="0.1" value="0" class="w-full accent-emerald-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 8. Chánh Định -->
-                    <div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl hover:border-indigo-500/40 transition-colors">
-                        <div class="flex justify-between items-center mb-1.5">
-                            <span class="font-medium text-sm text-slate-200 flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
-                                8. Chánh Định - Đối Xứng Gấp Khúc (Right Concentration)
-                            </span>
-                            <span id="val8" class="text-xs font-mono text-indigo-400 bg-indigo-950/50 px-2 py-0.5 rounded border border-indigo-800/50">6-Fold Symmetry</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-2">Sự định tâm sâu sắc tạo nên cấu trúc đối xứng hoàn hảo của đa tạp (Manifold Symmetry).</p>
-                        <input type="range" id="slider8" min="3" max="12" step="1" value="6" class="w-full accent-indigo-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- Right Column: Visualizer Canvas & Metrics -->
-        <section class="lg:col-span-5 flex flex-col gap-4">
-            <!-- Canvas Container -->
-            <div class="bg-topo-card/80 border border-slate-800/80 rounded-2xl p-4 shadow-xl backdrop-blur flex flex-col items-center">
-                <div class="w-full flex items-center justify-between mb-3">
-                    <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
-                        Topological Spacetime Mesh
-                    </span>
-                    <div class="flex items-center gap-2">
-                        <button id="btnPause" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all">Tạm dừng</button>
-                        <button id="btnFullScreen" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all">Phóng to</button>
-                    </div>
-                </div>
-
-                <!-- Canvas -->
-                <div class="relative w-full aspect-square bg-slate-950 rounded-xl overflow-hidden border border-slate-800/80 shadow-inner flex items-center justify-center">
-                    <canvas id="topoCanvas" class="w-full h-full block"></canvas>
-                </div>
-
-                <!-- Live Metrics Readout -->
-                <div class="grid grid-cols-3 gap-3 w-full mt-4 text-center">
-                    <div class="bg-slate-900/80 border border-slate-800/80 p-2.5 rounded-xl">
-                        <span class="text-[10px] text-slate-400 uppercase tracking-wide block">Độ Uốn Lưới</span>
-                        <span id="metricCurvature" class="text-sm font-bold font-mono text-purple-400">4.2 rad</span>
-                    </div>
-                    <div class="bg-slate-900/80 border border-slate-800/80 p-2.5 rounded-xl">
-                        <span class="text-[10px] text-slate-400 uppercase tracking-wide block">Năng lượng Topo</span>
-                        <span id="metricTopoEnergy" class="text-sm font-bold font-mono text-cyan-400">18.6 eV</span>
-                    </div>
-                    <div class="bg-slate-900/80 border border-slate-800/80 p-2.5 rounded-xl">
-                        <span class="text-[10px] text-slate-400 uppercase tracking-wide block">Tính Ổn Định</span>
-                        <span id="metricStability" class="text-sm font-bold font-mono text-emerald-400">96.4%</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Philosophical & Topology Insight Card -->
-            <div class="bg-topo-card/80 border border-slate-800/80 rounded-2xl p-4 shadow-xl backdrop-blur">
-                <h3 class="text-sm font-semibold text-purple-400 mb-2 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    Ý Nghĩa Topo & Bát Chánh Đạo
-                </h3>
-                <p id="insightText" class="text-xs text-slate-300 leading-relaxed">
-                    Trong toán học tô-pô (Topology), các vật thể có thể biến dạng liên tục mà không làm thay đổi bản chất hình học cốt lõi (như số lỗ Genus). Khi chiếu vào <span class="text-purple-400 font-semibold">Bát Chánh Đạo</span>, sự tu dưỡng chuyển hóa tâm thức chính là quá trình làm mượt mà và tối ưu hóa độ cong không-thời gian nội tâm, đưa trường năng lượng cá nhân hòa nhập vào cấu trúc bất biến của vũ trụ.
-                </p>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="border-t border-slate-800 py-4 text-center text-xs text-slate-500">
-        <p>Mô phỏng Đa tạp Topo & Ý thức Lượng tử tích hợp HTML5 Canvas.</p>
-    </footer>
-
-    <!-- Simulation & MP3 Audio Script -->
-    <script>
-        // --- AUDIO FLY SYSTEM CHO FILE MP3 LINK WEB & AUTO-PLAY ---
-        const bgAudio = document.getElementById('bgAudio');
-        const flyPlayer = document.getElementById('flyMusicPlayer');
-        const btnToggleMusic = document.getElementById('btnToggleMusic');
-        const musicIconWrapper = document.getElementById('musicIconWrapper');
-        const musicStatusText = document.getElementById('musicStatusText');
-        const playPauseIcon = document.getElementById('playPauseIcon');
-
-        let isPlayingMusic = false;
-
-        function toggleMusicPlayback() {
-            if (!isPlayingMusic) {
-                bgAudio.play().then(() => {
-                    isPlayingMusic = true;
-                    musicStatusText.textContent = "Đang phát nhạc nền";
-                    btnToggleMusic.textContent = "Dừng";
-                    btnToggleMusic.className = "ml-2 px-2.5 py-1.5 bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs font-medium transition-all";
-                    musicIconWrapper.classList.add('animate-spin-slow');
-                    playPauseIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
-                }).catch(error => {
-                    console.log("Trình duyệt chặn autoplay hoặc link mp3 lỗi:", error);
-                    musicStatusText.textContent = "Lỗi phát nhạc (Kiểm tra link)";
-                });
-            } else {
-                bgAudio.pause();
-                isPlayingMusic = false;
-                musicStatusText.textContent = "Đã tạm dừng";
-                btnToggleMusic.textContent = "Phát";
-                btnToggleMusic.className = "ml-2 px-2.5 py-1.5 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 text-purple-300 rounded-xl text-xs font-medium transition-all";
-                musicIconWrapper.classList.remove('animate-spin-slow');
-                playPauseIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
-            }
+  // Click trong iframe không nổi bọt ra trang cha, nên cần gắn listener riêng.
+  const simulationFrame = document.getElementById('simulation-frame');
+  function bindSimulationGestures() {
+    try {
+      const frameDoc = simulationFrame && simulationFrame.contentDocument;
+      if (!frameDoc || frameDoc.__sharedMusicGestureBound) return;
+      frameDoc.__sharedMusicGestureBound = true;
+      frameDoc.addEventListener('click', () => {
+        if (audio.paused) {
+          userPaused = false;
+          startMusic();
         }
-
-        btnToggleMusic.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMusicPlayback();
-        });
-
-        musicIconWrapper.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMusicPlayback();
-        });
-
-        // Tự động kích hoạt khi có sự kiện click/keydown đầu tiên trên trang (Auto-play unlock)
-        const autoPlayUnlockHandler = () => {
-            if (!isPlayingMusic) {
-                toggleMusicPlayback();
-            }
-            window.removeEventListener('click', autoPlayUnlockHandler);
-            window.removeEventListener('keydown', autoPlayUnlockHandler);
-        };
-
-        window.addEventListener('click', autoPlayUnlockHandler);
-        window.addEventListener('keydown', autoPlayUnlockHandler);
-
-
-        // --- TOPO SIMULATION SCRIPT ---
-        const canvas = document.getElementById('topoCanvas');
-        const ctx = canvas ? canvas.getContext('2d') : null;
-        if (!canvas || !ctx) {
-            console.error('Không thể khởi tạo canvas mô phỏng topo.');
-            throw new Error('Canvas 2D không khả dụng.');
+      });
+      frameDoc.addEventListener('keydown', () => {
+        if (audio.paused) {
+          userPaused = false;
+          startMusic();
         }
+      });
+    } catch (error) {
+      // Không làm gián đoạn mô phỏng nếu trình duyệt không cho truy cập iframe.
+    }
+  }
+  if (simulationFrame) {
+    simulationFrame.addEventListener('load', bindSimulationGestures);
+    bindSimulationGestures();
+  }
 
-        let isRunning = true;
-        let time = 0;
-
-        let params = {
-            genus: 1,         
-            curvature: 1.0,   
-            amplitude: 20,    
-            resolution: 24,   
-            flowSpeed: 1.0,   
-            twistFreq: 2.0,   
-            focusX: 0.0,      
-            focusY: 0.0,      
-            symmetry: 6       
-        };
-
-        const sliders = {
-            1: document.getElementById('slider1'),
-            2: document.getElementById('slider2'),
-            3: document.getElementById('slider3'),
-            4: document.getElementById('slider4'),
-            5: document.getElementById('slider5'),
-            6: document.getElementById('slider6'),
-            '7x': document.getElementById('slider7x'),
-            '7y': document.getElementById('slider7y'),
-            8: document.getElementById('slider8')
-        };
-
-        const values = {
-            1: document.getElementById('val1'),
-            2: document.getElementById('val2'),
-            3: document.getElementById('val3'),
-            4: document.getElementById('val4'),
-            5: document.getElementById('val5'),
-            6: document.getElementById('val6'),
-            7: document.getElementById('val7'),
-            8: document.getElementById('val8')
-        };
-
-        const metricCurvature = document.getElementById('metricCurvature');
-        const metricTopoEnergy = document.getElementById('metricTopoEnergy');
-        const metricStability = document.getElementById('metricStability');
-        const topoStatus = document.getElementById('topoStatus');
-        const insightText = document.getElementById('insightText');
-
-        function updateParams() {
-            params.genus = parseInt(sliders[1].value);
-            params.curvature = parseFloat(sliders[2].value);
-            params.amplitude = parseInt(sliders[3].value);
-            params.resolution = parseInt(sliders[4].value);
-            params.flowSpeed = parseFloat(sliders[5].value);
-            params.twistFreq = parseFloat(sliders[6].value);
-            params.focusX = parseFloat(sliders['7x'].value);
-            params.focusY = parseFloat(sliders['7y'].value);
-            params.symmetry = parseInt(sliders[8].value);
-
-            let genusNames = {0: 'Genus 0 (Sphere)', 1: 'Genus 1 (Torus)', 2: 'Genus 2 (Double Torus)', 3: 'Genus 3 (Triple Torus)', 4: 'Genus 4 (Complex Manifold)'};
-            values[1].textContent = genusNames[params.genus] || `Genus ${params.genus}`;
-            values[2].textContent = params.curvature.toFixed(1) + ' K';
-            values[3].textContent = params.amplitude + ' px';
-            values[4].textContent = params.resolution + ' node';
-            values[5].textContent = params.flowSpeed.toFixed(1) + 'x';
-            values[6].textContent = params.twistFreq.toFixed(1) + ' Hz';
-            values[7].textContent = `(${params.focusX}, ${params.focusY})`;
-            values[8].textContent = `${params.symmetry}-Fold Symmetry`;
-
-            metricCurvature.textContent = (params.curvature * 2.5).toFixed(1) + ' rad';
-            let topoEnergyVal = (params.amplitude * 0.5 + Math.abs(params.curvature) * 5 + params.symmetry * 1.2).toFixed(1);
-            metricTopoEnergy.textContent = topoEnergyVal + ' eV';
-
-            let stabilityVal = Math.min(99.8, Math.max(70, (90 + Math.sin(params.symmetry * 0.5) * 8 - Math.abs(params.curvature) * 2)).toFixed(1));
-            metricStability.textContent = stabilityVal + '%';
-
-            if (stabilityVal > 94) {
-                topoStatus.textContent = "Trạng thái: Đa Tạp Topo Hoàn Hảo";
-                topoStatus.className = "text-xs px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 font-medium animate-pulse";
-            } else {
-                topoStatus.textContent = "Trạng thái: Lưới Đang Biến Dạng";
-                topoStatus.className = "text-xs px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-medium";
-            }
-        }
-
-        Object.values(sliders).forEach(slider => {
-            slider.addEventListener('input', updateParams);
-        });
-
-        function resizeCanvas() {
-            const rect = canvas.parentElement.getBoundingClientRect();
-            const dpr = Math.max(1, window.devicePixelRatio || 1);
-            canvas.width = Math.max(1, Math.round(rect.width * dpr));
-            canvas.height = Math.max(1, Math.round(rect.height * dpr));
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        function drawTopology() {
-            const width = canvas.clientWidth;
-            const height = canvas.clientHeight;
-            if (!width || !height) {
-                requestAnimationFrame(drawTopology);
-                return;
-            }
-
-            const cx = width / 2 + params.focusX * (width * 0.25);
-            const cy = height / 2 + params.focusY * (height * 0.25);
-
-            ctx.fillStyle = '#020617';
-            ctx.fillRect(0, 0, width, height);
-
-            const cols = params.resolution;
-            const rows = params.resolution;
-            const cellW = width / cols;
-            const cellH = height / rows;
-
-            let points = [];
-
-            for (let i = 0; i <= cols; i++) {
-                points[i] = [];
-                for (let j = 0; j <= rows; j++) {
-                    let x = i * cellW;
-                    let y = j * cellH;
-
-                    let dx = x - cx;
-                    let dy = y - cy;
-                    let r = Math.hypot(dx, dy);
-                    let theta = Math.atan2(dy, dx);
-
-                    let warp = Math.sin(r * 0.02 * params.curvature - time * params.flowSpeed) * params.amplitude;
-                    let multiHole = Math.cos(theta * params.symmetry + time * params.twistFreq * 0.2) * (params.genus * 8);
-                    
-                    let zOffset = warp + multiHole;
-
-                    let projX = x + Math.cos(theta) * (zOffset * 0.3);
-                    let projY = y + Math.sin(theta) * (zOffset * 0.3) + Math.sin(time * params.flowSpeed + i * 0.2) * 5;
-
-                    points[i][j] = { x: projX, y: projY, z: zOffset };
-                }
-            }
-
-            ctx.lineWidth = 1;
-            for (let i = 0; i <= cols; i++) {
-                for (let j = 0; j <= rows; j++) {
-                    let p = points[i][j];
-                    let intensity = Math.min(1, Math.abs(p.z) / (params.amplitude + 15));
-
-                    if (i < cols) {
-                        let pNext = points[i + 1][j];
-                        ctx.beginPath();
-                        ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(pNext.x, pNext.y);
-                        ctx.strokeStyle = `rgba(6, 182, 212, ${0.15 + intensity * 0.6})`;
-                        ctx.stroke();
-                    }
-
-                    if (j < rows) {
-                        let pDown = points[i][j + 1];
-                        ctx.beginPath();
-                        ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(pDown.x, pDown.y);
-                        ctx.strokeStyle = `rgba(168, 85, 247, ${0.15 + intensity * 0.6})`;
-                        ctx.stroke();
-                    }
-
-                    if (i % 2 === 0 && j % 2 === 0) {
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, 1.5 + intensity * 2, 0, Math.PI * 2);
-                        ctx.fillStyle = intensity > 0.5 ? '#f59e0b' : '#06b6d4';
-                        ctx.fill();
-                    }
-                }
-            }
-
-            let vortexCount = params.symmetry;
-            for (let v = 0; v < vortexCount; v++) {
-                let vAngle = (v / vortexCount) * Math.PI * 2 + time * 0.3;
-                let vDist = 50 + Math.sin(time * 0.5 + v) * 25;
-                let vx = cx + Math.cos(vAngle) * vDist * (width / 400);
-                let vy = cy + Math.sin(vAngle) * vDist * (height / 400);
-
-                ctx.beginPath();
-                ctx.arc(vx, vy, 4 + Math.sin(time + v) * 2, 0, Math.PI * 2);
-                ctx.fillStyle = '#ec4899';
-                ctx.shadowColor = '#ec4899';
-                ctx.shadowBlur = 15;
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
-
-            if (isRunning) {
-                time += 0.04 * params.flowSpeed;
-            }
-            requestAnimationFrame(drawTopology);
-        }
-
-        document.getElementById('btnPerfect').addEventListener('click', () => {
-            sliders[1].value = "2";    
-            sliders[2].value = "1.8";  
-            sliders[3].value = "35";   
-            sliders[4].value = "30";   
-            sliders[5].value = "2.0";  
-            sliders[6].value = "3.5";  
-            sliders['7x'].value = "0.0";
-            sliders['7y'].value = "0.0";
-            sliders[8].value = "8";    
-            updateParams();
-        });
-
-        document.getElementById('btnReset').addEventListener('click', () => {
-            sliders[1].value = "1";
-            sliders[2].value = "1.0";
-            sliders[3].value = "20";
-            sliders[4].value = "24";
-            sliders[5].value = "1.0";
-            sliders[6].value = "2.0";
-            sliders['7x'].value = "0.0";
-            sliders['7y'].value = "0.0";
-            sliders[8].value = "6";
-            updateParams();
-        });
-
-        const btnPause = document.getElementById('btnPause');
-        btnPause.addEventListener('click', () => {
-            isRunning = !isRunning;
-            btnPause.textContent = isRunning ? "Tạm dừng" : "Tiếp tục";
-            btnPause.classList.toggle('bg-purple-600', !isRunning);
-        });
-
-        document.getElementById('btnFullScreen').addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                canvas.parentElement.requestFullscreen().catch(err => {
-                    console.log(err);
-                });
-            } else {
-                document.exitFullscreen();
-            }
-        });
-
-        updateParams();
-        requestAnimationFrame(drawTopology);
-    </script>
+  startMusic();
+})();
+</script>
 </body>
 </html>
